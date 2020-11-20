@@ -6,6 +6,7 @@
 typedef struct cmd_args {
 	long int page_size;
 	long int real_mem_size;
+	char* file_name;
 } cmd_args;
 
 /**

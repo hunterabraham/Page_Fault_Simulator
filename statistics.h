@@ -11,4 +11,8 @@ typedef struct stats_t {
 } stats_t;
 
 
+stats_t* initStats();
+
+void printStats(stats_t* stats, int clock);
+
 #endif

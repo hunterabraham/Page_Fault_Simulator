@@ -3,22 +3,11 @@
 #include "process.h"
 
 
-
 typedef struct memref {
 	process* proc;
 	int pid;
 	int page_no;
-}
-
-
-
-
-
-
-
-
-
-
+} memref;
 
 
 #endif

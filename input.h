@@ -2,11 +2,8 @@
 #define INPUT_H
 
 #include <stdio.h>
-
-typedef struct memref {
-	long int pid;
-	long int page_no;
-} memref;
+#include "memref.h"
+#include "process.h"
 
 
 
@@ -17,7 +14,16 @@ typedef struct memref {
  * @param traceFile - the traceFile being read
  * @return          - a reference to a memref struct
  */
-memref* readNext(FILE* traceFile);
+memref* readNext(FILE* traceFile, process** proc_list);
 
+
+/**
+ * findAllProcesses does one pass of the trace file and returns an array of processes
+ * that are found in the file
+ *
+ * @param traceFile - a pointer to the traceFile being read
+ * @return          - an array of processes
+ */
+process** findAllProcesses(FILE* traceFile);
 
 #endif

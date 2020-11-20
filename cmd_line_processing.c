@@ -33,7 +33,16 @@ cmd_args* processArgs(int argc, char** argv) {
 				printf("Argument required.\n");
 				break;
 		}
-	}	
+	}
+
+	for (int i = 0; i < argc; i++) {
+		if ((strcmp("-m", argv[i])) && (strcmp("-p", argv[i])) && (atoi(argv[i]) != argFlags->page_size)
+				&& (atoi(argv[i]) != argFlags->real_mem_size / 1048576) && (strcmp("537pfsim-fifo", argv[i]))) {
+			argFlags->file_name = argv[i];
+			fprintf(stderr, "|%s|", argv[i]);
+			break;
+		}
+	}
 	return argFlags;
 }
 
