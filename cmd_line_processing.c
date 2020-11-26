@@ -33,7 +33,7 @@ cmd_args* process_args(int argc, char** argv) {
 		}
 	}
 
-	for (int i = 0; i < argc; i++) {
+	for (int i = 1; i < argc; i++) {
 		if ((strcmp("-m", argv[i])) && (strcmp("-p", argv[i])) && ((unsigned long int)(atoi(argv[i]))) != argFlags->page_size
 				&& (((unsigned long int)atoi(argv[i])) != argFlags->real_mem_size / 1048576) && (strcmp("537pfsim-fifo", argv[i]))) {
 			argFlags->file_name = argv[i];

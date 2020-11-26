@@ -22,7 +22,8 @@
 		- if page table is full, use algorithm to determine which page to remove
 		- Remove page
 		- Add new page to page table
-
+11. Increment clock
+12. Update ready and blocked queues
 
 ## Modules
 
@@ -127,3 +128,29 @@
 	- *Summary:* Creates a ready and blocked queue for processes
 	- *Status:* INP
 	- *Files:* process_queue.h, process_queue.c
+	- *Methods:*
+		- `ready_blocked_queues_t* create_ready_blocked_queues(int size, process_t** ready_queue)`
+			- *Status:* Done
+			- *Functionality:* Creates the ready and blocked queues system and initializes struct members
+		- `process_queue_t* create_process_queue(int size)`
+			- *Status:* Done
+			- *Functionality:* Creates an individual queue (ready or blocked) for the ready-blocked system
+		- `process_t* get_next_process(ready_blocked_queues_t* queue)`
+			- *Status:* INP
+			- *Functionality:* Gets the next ready process
+		- `void update_queues(ready_blocked_queues_t* queue, unsigned long int clock)`
+			- *Status:* Done
+			- *Functionality:* Moves the first element in blocked to ready if it is ready
+		- `void move_to_blocked(ready_blocked_queues_t* queue)`
+			- *Status:* Done
+			- *Functionality:* Moves a process to the blocked queue
+		- `void add_to_ready(ready_blocked_queues_t* queues)`
+			- *Status:* Done
+			- *Functionality:* Moves a process to the ready queue
+
+
+
+
+
+
+

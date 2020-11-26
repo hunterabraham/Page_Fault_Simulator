@@ -16,7 +16,10 @@ int main(int argc, char** argv) {
 	char* fpath = args->file_name;
 	process_t** list_of_procs = find_all_processes(fpath);
 	ready_blocked_queues_t* queues = create_ready_blocked_queues(BUFSIZE, list_of_procs);
+	unsigned long int clock = 0;
 	
+	update_queues(queues, clock);
+
 	
 
 	/*

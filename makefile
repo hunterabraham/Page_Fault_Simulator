@@ -2,7 +2,7 @@ all: main_fifo.o input.o statistics.o cmd_line_processing.o process.o process_qu
 	gcc -o 537pfsim-fifo main_fifo.o input.o cmd_line_processing.o process.o statistics.o process_queue.o
 	echo all built successfully!
 
-process_queue.o: process_queue.h process_queue.c
+process_queue.o: process_queue.h process_queue.c process.o
 	gcc -Wextra -Wall -ggdb -c process_queue.c
 
 #inverted_page_table.o: inverted_page_table.c inverted_page_table.h
@@ -32,3 +32,9 @@ process.o: process.c process.h
 clean:
 	-rm 537pfsim-fifo
 	-rm *.o
+
+test.o: test.c 
+	gcc -Wall -Wextra -ggdb -c test.c
+
+test: test.o input.o statistics.o cmd_line_processing.o process.o process_queue.o
+	gcc -o test_suite test.o input.o cmd_line_processing.o process.o statistics.o process_queue.o

@@ -57,7 +57,7 @@ process_t* get_next_process(ready_blocked_queues_t* queue);
  * 
  * @param queue - the system of ready and blocked queues to grab from
  */
-void update_queues(ready_blocked_queues_t* queue);
+void update_queues(ready_blocked_queues_t* queue, unsigned long int clock);
 
 
 /**
@@ -66,7 +66,7 @@ void update_queues(ready_blocked_queues_t* queue);
  * @param queue   - the ready and blocked queues to adjust
  * @param process - the process to move from ready to blocked
  */
-void move_to_blocked(ready_blocked_queues_t* queue, process_t* proc);
+void move_to_blocked(ready_blocked_queues_t* queue);
 
 
 

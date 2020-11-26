@@ -29,7 +29,7 @@ process_t* create_process(unsigned long int pid) {
 	return new_proc;
 }
 
-unsigned long int isWaiting(process_t* process, unsigned long int clock) {
+unsigned long int is_waiting(process_t* process, unsigned long int clock) {
 	if (process->time_when_ready <= clock) {
 		return 0;
 	}

@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "process_queue.h"
-
+#include "process.h"
 /**
  * Creates a ready and blocked queue struct to store the ready processes and 
  * blocked processes
@@ -24,7 +24,7 @@ ready_blocked_queues_t* create_ready_blocked_queues(int size,  process_t** ready
 	ready->curr_size = i;
 	ready->max_size = size;
 	ready->begin = 0;
-	ready->end = i + 1; // FIXME: might be wrong
+	ready->end = i; // FIXME: might be wrong
 	process_queue_t* blocked = malloc(sizeof(process_queue_t));
 	if (NULL == blocked) {
 		fprintf(stderr, "Error allocating blocked queue in create_ready_blocked_queues() in process_queue.c\n");
@@ -49,6 +49,8 @@ ready_blocked_queues_t* create_ready_blocked_queues(int size,  process_t** ready
 	return rb_q;
 }
 
+
+
 /**
  * When the current process gets blocked, this method finds the next
  * available process and returns it
@@ -62,6 +64,20 @@ process_t* get_next_process(ready_blocked_queues_t* queue) {
 }
 
 
+/**
+ * Takes a process in the blocked queue and adds it to the end of the ready queue 
+ * 
+ * @param idx    - the index of the process in blocked
+ * @param queues - the queues that are being manipulated
+ */
+void add_to_ready(ready_blocked_queues_t* queues) {
+	queues->ready_queue->process_array[queues->ready_queue->end] = queues->blocked_queue->process_array[queues->blocked_queue->begin];
+	queues->blocked_queue->begin = (queues->blocked_queue->begin + 1) % queues->blocked_queue->max_size;
+	queues->ready_queue->end = (queues->ready_queue->end + 1) % queues->ready_queue->max_size;
+	queues->blocked_queue->begin = (queues->blocked_queue->begin + 1) % queues->blocked_queue->max_size;
+	queues->blocked_queue->curr_size--;
+	queues->ready_queue->curr_size++;
+}
 
 /**
  * Updates the ready and blocked queues. When the process is unblocked, it
@@ -69,9 +85,14 @@ process_t* get_next_process(ready_blocked_queues_t* queue) {
  * 
  * @param queue - the system of ready and blocked queues to grab from
  */
-void update_queues(ready_blocked_queues_t* queue) {
-	
-
+void update_queues(ready_blocked_queues_t* queue, unsigned long int clock) {
+	process_queue_t* blocked = queue->blocked_queue;
+	process_t* proc;
+	if ((proc = blocked->process_array[0]) != NULL) {
+		if (!is_waiting(proc, clock)) {
+			add_to_ready(queue);
+		}
+	}
 }
 
 
@@ -81,9 +102,11 @@ void update_queues(ready_blocked_queues_t* queue) {
  * @param queue   - the ready and blocked queues to adjust
  * @param process - the process to move from ready to blocked
  */
-void move_to_blocked(ready_blocked_queues_t* queue, process_t* proc) {
+void move_to_blocked(ready_blocked_queues_t* queue) {
 	queue->blocked_queue->process_array[queue->blocked_queue->end] = queue->ready_queue->process_array[queue->ready_queue->begin];
 	queue->ready_queue->begin = (queue->ready_queue->begin + 1) % queue->ready_queue->max_size;
+	queue->ready_queue->curr_size--;
+	queue->blocked_queue->curr_size++;
 	queue->blocked_queue->end = (queue->blocked_queue->end + 1) % queue->blocked_queue->max_size;
 }
 
