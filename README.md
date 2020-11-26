@@ -12,16 +12,16 @@
 6. If no current process exists, pop a process from ready queue
 7. Get next memory reference for that process
 8. If page is in table
-	a. continue
+	- continue
 9. If page is not in table
-	a. Add page to disk queue
-	b. Move process to blocked queue
-	c. Set current process pointer to NULL (Cause memory reference error?)
+	- Add page to disk queue
+	- Move process to blocked queue
+	- Set current process pointer to NULL (Cause memory reference error?)
 10. Check if disk is ready
-	a. if it is, pop page from disk queue
-		i. if page table is full, use algorithm to determine which page to remove
-		ii. Remove page
-		iii. Add new page to page table
+	- if it is, pop page from disk queue
+		- if page table is full, use algorithm to determine which page to remove
+		- Remove page
+		- Add new page to page table
 
 
 ## Modules
