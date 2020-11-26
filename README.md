@@ -4,45 +4,87 @@
 
 ## Modules
 
-- *cmd_line_processing.h:* 
+- **cmd_line_processing.h:**
 	- *Summary:* Parses command line arguments to construct page table
 	- *Status:* Completed
-	- *Files:* cmd\_line\_processing.h, cmd\_line\_processing.c
+	- *Files:* cmd_line_processing.h, cmd_line_processing.c
+	- *Methods:*
+		- `cmd_args process_args(int argc, char** argv)`
+			- *Status:* Done
+			- *Functionality:* Processes command line arguments to get file name, mem size, and page size
+	
 
-- *input*
+- **input.h**
 	- *Summary:* Parses input file to construct process queue and get next memory reference
 	- *Status:* INP
 	- *Files:* input.c, input.h
+	- *Methods:*
+		- `process_t** find_all_processes(char* fpath)`
+			- *Status:* Done
+			- *Functionality:* Finds all processes and blocks which these processes have in the file
+		- `unsigned long int read_next(process_t* process)`
+			- *Status:* INP
+			- *Functionality:* Reads the next memory reference for the process
 
-- *memref*
-	- *Summary:* Stores a memory reference
-	- *Status:* Completed
-	- *Files:* memref.h
+- **process.h**
+	- *Summary:* Stores the info for each process, including page table, etc.
+	- *Status:* INP
+	- *Files:* process.h, process.c
+	- *Methods:*
+		- `unsigned long int is_waiting(process_t* process, unsigned long int clock)`
+			- *Status:* Done
+			- *Functionality:* Determines if a process is waiting or not
+		- `process_t* create_process(unsigned long int pid);`
+			- *Status:* Done
+			- *Functionality:* Creates a process and initializes struct members
 
-## Features
-
-- User can specify which target they would like to execute
-
-- **-f: <fname>** Allows user to specify the name of the makefile
-
-## Checklist
-
-
-- [x] A target line always begins in the first column (i.e., starts on the first character of a line).
-- [x] The target (which is is usually the name of a file being created by one of the commands in the build specification) is followed by a ":" character and then a list of dependence names, each separated by white space (any number of spaces or tabs).
-- [x] A dependence is either the name of another target or the name of a file. It is an error if there is no file or target that matches the dependence.
-- [x] If there is a cycle in the chain in any of the dependences, then that is an error.
-- [x] A command line always starts with a tab character (not spaces).
-- [x] The list of commands for a target ends either when a new target starts or at the end of the files.
-- [x] Blank lines are ignored and can appear in the middle of a list of commands. Blank means an empty line or one with only white space.
-- [x] A line that begins with a "#" as the first character on the line is a comment line. The rest of the line is ignored. Comment lines are ignored and can appear in the middle of a list of commands. Note that if a comment line is too long, it is reported as an error.
-- [x] Lines that contain a null (zero) byte within the line are invalid and reported as an error.
-- [x] Non-blank lines must begin with a target name or tab; otherwise they are invalid and reported as an error.
-- [x] Any command that exits with an error (a non-zero completion code) terminates the make process.
-- [x] When you find an error while parsing the makefile, you will print an error message to stderr. This error message will look like:
-- [x] 10: <error message>: "blah blah blah" where "<error message>" is an informative error message and "10" is the line number in the makefile of the bad line and "blah blah blah" is the contents of the bad line. After printing the error message, your program will exit.
-- [x] When you find an error while executing lines in your makefile, such as file not found, you will print an error message to stderr.
-- [x] On any error, after printing the error message, your program should exit.
-- [x] Set your maximum line length to 4K (4096), including terminating null byte.
+- **page_table.h**
+	- *Summary:* Stores a page table implemented as a hash map
+	- *Status:* INP
+	- *Files:* page_table.h, page_table.c
+	- *Methods:*
+		- `page_table_t* create_page_table(unsigned long int size)`
+			- *Status:* Done
+			- *Functionality:* Creates a page table and initializes struct members
+		- `page_t* get_from_ptable(page_table_t* table, unsigned long int pid, unsigned long int vpn)`
+			- *Status:* INP
+			- *Functionality:* Gets the page from the page table with the corresponding vpn
+		- `void add_to_ptable(page_table_t* ptable, page_t* page)`
+			- *Status:* INP
+			- *Functionality:* Adds a new page to the page table
+		- `page_t* remove_from_ptable(page_table_t* ptable, page_t* page)`
+			- *Status:* INP
+			- *Functionality:* Removes a page from the page table
+		- `unsigned long int hash_ptable(page_table_t* table, page_t* page)`
+			- *Status:* INP
+			- *Functionality:* Hashes a page to the corresponding index in the page table
 
 
+- **disk.h**
+	- *Summary:* Stores all pages being pushed to disk
+	- *Status:* INP
+	- *Files:* disk.c, disk.h
+	- *Methods:*
+		- `disk_t* create_disk(int size)`
+			- *Status:* INP
+			- *Functionality:* Creates disk and initializes struct members
+		- `void add_page_to_disk(disk_t* disk, page_t* page)`
+			- *Status:* INP
+			- *Functionality:* Adds a page to the disk queue
+		- `page_t* remove_page_from_disk(disk_t* disk)`
+			- *Status:* INP
+			- *Functionality:* Removes a page from the disk queue
+		- `unsigned long int is_ready(disk_t* disk, unsigned long int clock)`
+			- *Status:* INP
+			- *Functionality:* Determines if the disk is ready to start another I/O operation
+
+- **inverted_page_table.h**
+	- *Summary:* Stores ppn-><vpn, pid> mapping
+	- *Status:* INP
+	- *Files:* inverted_page_table.h, inverted_table_table.c
+
+
+- **process_queue.h**
+	- *Summary:* Creates a ready and blocked queue for processes
+	- *Status:* INP
+	- *Files:* process_queue.h, process_queue.c

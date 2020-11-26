@@ -1,5 +1,3 @@
-
-
 #include <unistd.h>
 #include <stdio.h>
 #include <dirent.h>
@@ -11,7 +9,7 @@
 
 
 
-cmd_args* processArgs(int argc, char** argv) {
+cmd_args* process_args(int argc, char** argv) {
 	// create instance of struct to store flags and filenames	
 	cmd_args* argFlags = malloc(sizeof(cmd_args));
 	if (NULL == argFlags) {
@@ -36,10 +34,9 @@ cmd_args* processArgs(int argc, char** argv) {
 	}
 
 	for (int i = 0; i < argc; i++) {
-		if ((strcmp("-m", argv[i])) && (strcmp("-p", argv[i])) && (atoi(argv[i]) != argFlags->page_size)
-				&& (atoi(argv[i]) != argFlags->real_mem_size / 1048576) && (strcmp("537pfsim-fifo", argv[i]))) {
+		if ((strcmp("-m", argv[i])) && (strcmp("-p", argv[i])) && ((unsigned long int)(atoi(argv[i]))) != argFlags->page_size
+				&& (((unsigned long int)atoi(argv[i])) != argFlags->real_mem_size / 1048576) && (strcmp("537pfsim-fifo", argv[i]))) {
 			argFlags->file_name = argv[i];
-			fprintf(stderr, "|%s|", argv[i]);
 			break;
 		}
 	}

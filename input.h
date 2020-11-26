@@ -2,19 +2,20 @@
 #define INPUT_H
 
 #include <stdio.h>
-#include "memref.h"
 #include "process.h"
-
+#include "page_table.h"
 
 
 /**
- * readNext() reads the next line in a trace file into memory and converts
+ * read_next() reads the next line in a trace file into memory and converts
  * it to a memref struct with the pid and page number
  *
- * @param traceFile - the traceFile being read
- * @return          - a reference to a memref struct
+ * @param trace_file - the traceFile being read
+ * @param process    - the process whose next trace is being read
+ * @return           - a reference to a memref struct
  */
-memref* readNext(FILE* traceFile, process** proc_list);
+
+unsigned long int read_next(process_t* process);
 
 
 /**
@@ -22,8 +23,9 @@ memref* readNext(FILE* traceFile, process** proc_list);
  * that are found in the file
  *
  * @param traceFile - a pointer to the traceFile being read
+ * @param fpath     - the file path trace_file
  * @return          - an array of processes
  */
-process** findAllProcesses(FILE* traceFile);
+process_t** find_all_processes(char* fpath);
 
 #endif
