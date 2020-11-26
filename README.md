@@ -2,6 +2,28 @@
 
 ## Page fault simulator using various page replacement algorithms
 
+## Main Algorithm
+
+1. Get command line arguments (page size, real memory size, and trace file name)
+2. Do first pass of the trace file, creating the process list with maps to its blocks in the trace file
+3. Build ready and blocked queues for the processes. Put all processes in the ready queue
+4. Initialize disk, inverted page table (??), and statistics
+5. Start main loop
+6. If no current process exists, pop a process from ready queue
+7. Get next memory reference for that process
+8. If page is in table
+	a. continue
+9. If page is not in table
+	a. Add page to disk queue
+	b. Move process to blocked queue
+	c. Set current process pointer to NULL (Cause memory reference error?)
+10. Check if disk is ready
+	a. if it is, pop page from disk queue
+		i. if page table is full, use algorithm to determine which page to remove
+		ii. Remove page
+		iii. Add new page to page table
+
+
 ## Modules
 
 - **cmd_line_processing.h:**
@@ -79,9 +101,26 @@
 			- *Functionality:* Determines if the disk is ready to start another I/O operation
 
 - **inverted_page_table.h**
-	- *Summary:* Stores ppn-><vpn, pid> mapping
+	- *Summary:* Stores ppn-><vpn, pid> mapping in a hash map
 	- *Status:* INP
 	- *Files:* inverted_page_table.h, inverted_table_table.c
+	- *Methods:*
+		- `inverted_ptable_t* create_inverted_page_table(unsigned long int size)`
+			- *Status:* INP
+			- *Functionality:* Creates inverted page table and initializes struct members
+		- `inverted_page_t* get_from_ptable(inverted_ptable_t* table, unsigned long int pid, unsigned long int vpn)`
+			- *Status:* INP
+			- *Functionality:* Gets an inverted page from the inverted page table using ppn hashing
+		- `void add_to_ptable(inverted_ptable_t* ptable, page_t* page)`
+			- *Status:* INP
+			- *Functionality:* Adds an inverted page to the page table
+		- `page_t* remove_from_ptable(inverted_ptable_t* ptable, page_t* page)`
+			- *Status:* INP
+			- *Functionality:* Removes an inverted page from the page table
+		- `unsigned long int hash_inverted_ptable(inverted_page_table_t* table, inverted_page_t* page)`
+			- *Status:* INP
+			- *Functionality:* Hashes an inverted page to an index in the inverted page table
+
 
 
 - **process_queue.h**
