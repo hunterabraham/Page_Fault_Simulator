@@ -1,5 +1,5 @@
-#ifndef PTABLE_H
-#define PTABLE_H
+#ifndef PTABLE_INV_H
+#define PTABLE_INV_H
 #include "page.h"
 
 // page to be held in page table

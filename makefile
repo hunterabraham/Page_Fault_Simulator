@@ -1,5 +1,5 @@
-all: main_fifo.o input.o statistics.o cmd_line_processing.o process.o process_queue.o disk.o page_table.o
-	gcc -o 537pfsim-fifo main_fifo.o input.o cmd_line_processing.o process.o statistics.o process_queue.o disk.o page_table.o
+all: main_fifo.o input.o statistics.o cmd_line_processing.o process.o process_queue.o disk.o page_table.o fifo.o
+	gcc -o 537pfsim-fifo main_fifo.o input.o cmd_line_processing.o process.o statistics.o process_queue.o disk.o page_table.o fifo.o
 	echo all built successfully!
 
 process_queue.o: process_queue.h process_queue.c process.o
@@ -7,6 +7,9 @@ process_queue.o: process_queue.h process_queue.c process.o
 
 #inverted_page_table.o: inverted_page_table.c inverted_page_table.h
 #	gcc -Wextra -Wall -ggdb -c inverted_page_table.c
+
+fifo.o: fifo.c fifo.h
+	gcc -Wall -Wextra -ggdb -c fifo.c
 
 input.o: input.c input.h
 	gcc -Wall -Wextra -ggdb -c input.c

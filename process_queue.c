@@ -39,13 +39,31 @@ ready_blocked_queues_t* create_ready_blocked_queues(int size,  process_t** ready
 	blocked->max_size = size;
 	blocked->begin = 0;
 	blocked->end = 0;
+	process_queue_t* finished = malloc(sizeof(process_queue_t));
+	if (NULL == finished) {
+		fprintf(stderr, "Error allocating finished in create_ready_blocked_queues()\n");
+		exit(1);
+	}
+	finished->process_array = malloc(sizeof(process_t*) * size);
+	if (NULL == finished->process_array) {
+		fprintf(stderr, "Error allocating finished->process_array in create_ready_blocked_queues()\n");
+		exit(1);
+	}
+	finished->curr_size = 0;
+	finished->max_size = size;
+	finished->begin = 0;
+	finished->end = 0;
+	
+	
 	ready_blocked_queues_t* rb_q = malloc(sizeof(ready_blocked_queues_t));
 	if (NULL == rb_q) {
 		fprintf(stderr, "Error allocating rb_q in create_ready_blocked_queues() in process_queue.c\n");
 		exit(1);
 	}
+	
 	rb_q->ready_queue = ready;
 	rb_q->blocked_queue = blocked;
+	rb_q->finished_queue = finished;
 	rb_q->num_procs = i;
 	return rb_q;
 }
@@ -75,7 +93,7 @@ void add_to_ready(ready_blocked_queues_t* queues) {
 	queues->ready_queue->process_array[queues->ready_queue->end] = queues->blocked_queue->process_array[queues->blocked_queue->begin];
 	queues->blocked_queue->begin = (queues->blocked_queue->begin + 1) % queues->blocked_queue->max_size;
 	queues->ready_queue->end = (queues->ready_queue->end + 1) % queues->ready_queue->max_size;
-	queues->blocked_queue->begin = (queues->blocked_queue->begin + 1) % queues->blocked_queue->max_size;
+	//queues->blocked_queue->begin = (queues->blocked_queue->begin + 1) % queues->blocked_queue->max_size;
 	queues->blocked_queue->curr_size--;
 	queues->ready_queue->curr_size++;
 }
@@ -96,6 +114,12 @@ void update_queues(ready_blocked_queues_t* queue, unsigned long int clock) {
 	}
 }
 
+unsigned long int remove_from_ready(ready_blocked_queues_t* queues) {
+	unsigned long int ret = queues->ready_queue->process_array[queues->ready_queue->begin]->num_pages;
+	queues->ready_queue->begin = (queues->ready_queue->begin + 1) % queues->ready_queue->max_size;
+	queues->ready_queue->curr_size--;
+	return ret;
+}
 
 /**
  * Moves a ready process to the blocked queue when it is blocked
@@ -111,7 +135,46 @@ void move_to_blocked(ready_blocked_queues_t* queue) {
 	queue->blocked_queue->end = (queue->blocked_queue->end + 1) % queue->blocked_queue->max_size;
 }
 
+void move_to_finished(ready_blocked_queues_t* queue) {
+	queue->finished_queue->process_array[queue->finished_queue->end] = queue->ready_queue->process_array[queue->ready_queue->begin];
+	queue->ready_queue->begin = (queue->ready_queue->begin + 1) % queue->ready_queue->max_size;
+	queue->ready_queue->curr_size--;
+	queue->finished_queue->curr_size++;
+	queue->finished_queue->end = (queue->finished_queue->end + 1) % queue->finished_queue->max_size;
+}
+
 
 process_t* peek_ready(ready_blocked_queues_t* queues) {
 	return queues->ready_queue->process_array[queues->ready_queue->begin];
 }
+
+process_t* search_for_process(ready_blocked_queues_t* queues, unsigned long int pid) {
+	process_queue_t* ready = queues->ready_queue;
+	unsigned long int i = ready->begin;
+	while(ready->process_array[i] != NULL) {
+		if (ready->process_array[i]->pid == pid) {
+			return ready->process_array[i];
+		}
+		i++;
+	}
+	process_queue_t* blocked = queues->blocked_queue;
+	i = blocked->begin;
+	while(blocked->process_array[i] != NULL) {
+		if (blocked->process_array[i]->pid == pid) {
+			return blocked->process_array[i];
+		}
+		i++;
+	}
+
+	process_queue_t* finished = queues->finished_queue;
+	i = finished->begin;
+	while(finished->process_array[i] != NULL) {
+		if (finished->process_array[i]->pid == pid) {
+			return finished->process_array[i];
+		}
+		i++;
+	}
+	return NULL;
+}
+
+

@@ -5,7 +5,7 @@
 
 
 
-stats_t* initStats() {
+stats_t* init_stats() {
 	stats_t* stats = malloc(sizeof(stats_t));
 	if (NULL == stats) {
 		fprintf(stderr, "Error allocating stats in initStats() in statistics.c\n");
@@ -20,12 +20,12 @@ stats_t* initStats() {
 	return stats;
 }
 
-void printStats(stats_t* stats, int clock) {
+void print_stats(stats_t* stats, unsigned long int clock) {
 	printf("Average Memory Utilization (AMU): %f\n", stats->average_memory_utilization);
 	printf("Average Runnable Processes (ARP): %f\n", stats->average_runnable_processes);
-	printf("Total Memory References (TMR):    %d\n", stats->total_memory_references);
-	printf("Total Page Faults (TPF):          %d\n", stats->total_page_faults);
-	printf("Total Running Time:               %d\n", clock);
+	printf("Total Memory References (TMR):    %ld\n", stats->total_memory_references);
+	printf("Total Page Faults (TPF):          %ld\n", stats->total_page_faults);
+	printf("Total Running Time:               %ld\n", clock);
 }
 
 

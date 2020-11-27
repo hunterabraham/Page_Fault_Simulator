@@ -2,17 +2,17 @@
 #define STATS_H
 
 typedef struct stats_t {
-	int sum_page_frames;
+	unsigned long int sum_page_frames;
 	double average_memory_utilization;
-	int sum_runnable_processes;
+	unsigned long int sum_runnable_processes;
 	double average_runnable_processes;
-	int total_memory_references;
-	int total_page_faults;
+	unsigned long int total_memory_references;
+	unsigned long int total_page_faults;
 } stats_t;
 
 
-stats_t* initStats();
+stats_t* init_stats();
 
-void printStats(stats_t* stats, int clock);
+void print_stats(stats_t* stats, unsigned long int clock);
 
 #endif

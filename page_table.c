@@ -41,7 +41,7 @@ page_table_t* create_page_table(unsigned long int size) {
  * @param ptable - the table being added to
  * @param page   - the page being added
  */ 
-void add_to_ptable(page_table_t* ptable, page_t* page) {
+unsigned long int add_to_ptable(page_table_t* ptable, page_t* page) {
     unsigned long int index = hash_ptable(ptable, page);
     while(ptable->free_list[index] == 0) {
         index++;
@@ -49,6 +49,7 @@ void add_to_ptable(page_table_t* ptable, page_t* page) {
     ptable->free_list[index] = 0;
     ptable->page_array[index] = page;
     page->page_table_idx = index;
+    return index;
 }
 
 
@@ -81,7 +82,7 @@ unsigned long int is_in_ptable(page_table_t* table, page_t* page) {
     }
     unsigned long int index = page->page_table_idx;
     page_t* found_page = table->page_array[index];
-    if (page->pid == found_page->pid && page->vpn == found_page->vpn && !table->free_list[index]) {
+    if (page->vpn == found_page->vpn && !table->free_list[index]) {
         return 1;
     }
     return 0;

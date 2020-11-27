@@ -1,3 +1,6 @@
+#ifndef PROCESS_Q_H
+#define PROCESS_Q_H
+
 #include "process.h"
 
 
@@ -21,6 +24,7 @@ typedef struct process_queue_t {
 typedef struct ready_blocked_queues_t {
 	process_queue_t* ready_queue;
 	process_queue_t* blocked_queue;
+	process_queue_t* finished_queue;
 	unsigned long int num_procs;
 } ready_blocked_queues_t;
 
@@ -63,7 +67,7 @@ void update_queues(ready_blocked_queues_t* queue, unsigned long int clock);
 
 /**
  * Moves a ready process to the blocked queue when it is blocked
- *
+ * Also updates its time until ready
  * @param queue   - the ready and blocked queues to adjust
  * @param process - the process to move from ready to blocked
  */
@@ -79,9 +83,39 @@ void move_to_blocked(ready_blocked_queues_t* queue);
 process_t* peek_ready(ready_blocked_queues_t* queues);
 
 
+/**
+ * Happens when process is done executing. Frees all the process' memory and removes it 
+ * from the queue
+ * 
+ * @param queues - the queues being removed from
+ * @return       - the number of pages that this process held in memory
+ */
+unsigned long int remove_from_ready(ready_blocked_queues_t* queues);
 
 
+/**
+ * Linear search method to find a process by pid
+ * 
+ * @param queues - the queues being searched through
+ * @param pid    - the pid of the target process
+ * @return       - the process that is found
+ */
+process_t* search_for_process(ready_blocked_queues_t* queues, unsigned long int pid);
+
+/**
+ * Moves a finished process that's done executing from ready to finished
+ * 
+ * @param queues - the queues being manipulated
+ */
+void move_to_finished(ready_blocked_queues_t* queues);
 
 
+/**
+ * Takes a process in the blocked queue and adds it to the end of the ready queue 
+ * 
+ * @param idx    - the index of the process in blocked
+ * @param queues - the queues that are being manipulated
+ */
+void add_to_ready(ready_blocked_queues_t* queues);
 
-
+#endif

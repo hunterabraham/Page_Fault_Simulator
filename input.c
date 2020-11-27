@@ -72,20 +72,22 @@ process_t** find_all_processes(char* fpath, unsigned long int page_table_size) {
 	unsigned long int curr_row = 0;
 	unsigned long int curr_num_bytes = 0;
 	while(NULL != fgets(buffer, BUFSIZE, trace_file)) {
-		curr_num_bytes += strlen(buffer);
-		unsigned long int* ret_arr = split(buffer);
-		
+		unsigned long int temp_bytes = strlen(buffer);
+		unsigned long int* ret_arr = split(buffer); // current line
 		unsigned long int pid = ret_arr[1];
 		long int idx = contains(process_list, pid); // see if process is in list
 		if (idx == -1) { // if it isn't, make a new one and add it to the list
-			process_t* new_proc = create_process(pid, page_table_size); // TODO: initialize struct members
-			new_proc->first_ref = curr_row;
+			
+			//fprintf(stderr, "First line: %s\n", buffer);
+			process_t* new_proc = create_process(pid, page_table_size);
+			new_proc->first_ref = curr_row; // mark the first reference
 			new_proc->last_ref = curr_row;
 			new_proc->blocks[new_proc->num_blocks].start = curr_num_bytes;
 			new_proc->blocks[new_proc->num_blocks].end = curr_num_bytes;
 			new_proc->blocks[new_proc->num_blocks].curr_line = 0;
 			new_proc->num_blocks++;
 			new_proc->fptr = fopen(fpath, "r");
+			fseek(new_proc->fptr, curr_num_bytes, SEEK_SET); // FIXME
 			if (NULL == new_proc->fptr) {
 				fprintf(stderr, "Error opening file in findAllProcesses() in input.c\n");
 				exit(1);
@@ -95,7 +97,15 @@ process_t** find_all_processes(char* fpath, unsigned long int page_table_size) {
 		} else { // process already in table, update row and potentially create new block / update block
 			process_t* curr_proc = process_list[idx];
 			if (curr_proc->last_ref != curr_row - 1) { // if not a continuation of old block, make new one
+				
 				curr_proc->blocks[curr_proc->num_blocks].start = curr_num_bytes;
+				/*
+				FILE* fptr_temp = fopen(fpath, "r");
+				fseek(fptr_temp, curr_num_bytes, SEEK_SET);
+				char* buffer_temp = malloc(sizeof(char) * 400);
+				fgets(buffer_temp, 400, fptr_temp);
+				fprintf(stderr, "%s for process %ld\n", buffer_temp, curr_proc->pid);
+				*/
 				curr_proc->blocks[curr_proc->num_blocks].end = curr_num_bytes;
 				curr_proc->blocks[curr_proc->num_blocks].curr_line = 0;
 				curr_proc->num_blocks++;
@@ -105,6 +115,8 @@ process_t** find_all_processes(char* fpath, unsigned long int page_table_size) {
 			curr_proc->last_ref = curr_row;
 		}
 		curr_row++;
+		curr_num_bytes += temp_bytes; // add number of bytes in the current line
+
 		free(ret_arr);
 	}
 	free(buffer);
@@ -118,6 +130,10 @@ page_t* read_next(process_t* process) {
 	char* result;
 	while (1) { // FIXME
 		result = fgets(BUFFER, BUFSIZE, process->fptr);
+		if (result == NULL) {
+			return NULL;
+		}
+		unsigned long int num_bytes = strlen(BUFFER);
 		unsigned long int* res_array = split(result);
 		unsigned long int pid = res_array[1];
 		if (pid != process->pid) { // done with current block, move to next one
@@ -140,6 +156,7 @@ page_t* read_next(process_t* process) {
 		new_page->pid = this_pid;
 		new_page->vpn = vpn;
 		new_page->page_table_idx = -1;
+		new_page->num_bytes = num_bytes;
 		return new_page;
 	}
 }

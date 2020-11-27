@@ -26,6 +26,7 @@ typedef struct process_t {
 	unsigned long int curr_block_idx; // starts at 0, lets us know which block we're on
 	FILE* fptr; // where in the file the current process is
 	unsigned long int curr_line_idx;
+	unsigned long int num_pages;
 } process_t;
 
 /**

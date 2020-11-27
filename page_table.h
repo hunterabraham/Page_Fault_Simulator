@@ -1,11 +1,13 @@
 #ifndef PTABLE_H
 #define PTABLE_H
 
+
 // page to be held in page table
 typedef struct page_t {
 	unsigned long int pid;
 	unsigned long int vpn;
 	long int page_table_idx;
+	unsigned long int num_bytes;
 } page_t;
 
 // page table to hold all pages for a process
@@ -41,7 +43,7 @@ page_t* get_from_ptable(page_table_t* table, unsigned long int pid, unsigned lon
  * @param ptable - the table being added to
  * @param page   - the page being added
  */ 
-void add_to_ptable(page_table_t* ptable, page_t* page);
+unsigned long int add_to_ptable(page_table_t* ptable, page_t* page);
 
 
 /**
