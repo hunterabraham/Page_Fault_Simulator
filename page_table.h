@@ -5,6 +5,7 @@
 typedef struct page_t {
 	unsigned long int pid;
 	unsigned long int vpn;
+	long int page_table_idx;
 } page_t;
 
 // page table to hold all pages for a process
@@ -12,7 +13,7 @@ typedef struct page_table_t {
 	page_t** page_array;
 	unsigned long int curr_size;
 	unsigned long int max_size;
-	unsigned long int** free_list; // FIXME might not need this, free list of indices
+	unsigned long int* free_list; // FIXME might not need this, free list of indices
 } page_table_t;
 
 
@@ -59,5 +60,14 @@ page_t* remove_from_ptable(page_table_t* ptable, page_t* page);
  * @return     - the index that results from the hash function
  */
 unsigned long int hash_ptable(page_table_t* table, page_t* page);
+
+/**
+ * Determines if a page is in the current page table for this process
+ * 
+ * @param page  - the page that is being searched for
+ * @param table - the table that is being searched through
+ * @return      - 1 if found, 0 otherwise
+ */
+unsigned long int is_in_ptable(page_table_t* table, page_t* page);
 
 #endif

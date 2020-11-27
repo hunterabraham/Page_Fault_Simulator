@@ -1,5 +1,5 @@
-all: main_fifo.o input.o statistics.o cmd_line_processing.o process.o process_queue.o
-	gcc -o 537pfsim-fifo main_fifo.o input.o cmd_line_processing.o process.o statistics.o process_queue.o
+all: main_fifo.o input.o statistics.o cmd_line_processing.o process.o process_queue.o disk.o page_table.o
+	gcc -o 537pfsim-fifo main_fifo.o input.o cmd_line_processing.o process.o statistics.o process_queue.o disk.o page_table.o
 	echo all built successfully!
 
 process_queue.o: process_queue.h process_queue.c process.o
@@ -20,11 +20,12 @@ statistics.o: statistics.c statistics.h
 cmd_line_processing.o: cmd_line_processing.c cmd_line_processing.h
 	gcc -Wall -Wextra -ggdb -c cmd_line_processing.c
 
-#page_table.o: page_table.c page_table.h
-#	gcc -Wall -Wextra -ggdb -c page_table.c
+page_table.o: page_table.c page_table.h
+	gcc -Wall -Wextra -ggdb -c page_table.c
 
-#disk.o: disk.c disk.h
-#	gcc -Wall -Wextra -ggdb -c disk.c
+
+disk.o: disk.c disk.h
+	gcc -Wall -Wextra -ggdb -c disk.c
 
 process.o: process.c process.h
 	gcc -Wall -Wextra -ggdb -c process.c
@@ -36,5 +37,5 @@ clean:
 test.o: test.c 
 	gcc -Wall -Wextra -ggdb -c test.c
 
-test: test.o input.o statistics.o cmd_line_processing.o process.o process_queue.o
-	gcc -o test_suite test.o input.o cmd_line_processing.o process.o statistics.o process_queue.o
+test: test.o input.o statistics.o cmd_line_processing.o process.o process_queue.o page_table.o disk.o
+	gcc -o test_suite test.o input.o cmd_line_processing.o process.o statistics.o process_queue.o page_table.o disk.o

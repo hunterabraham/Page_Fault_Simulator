@@ -43,22 +43,22 @@
 	- *Files:* input.c, input.h
 	- *Methods:*
 		- `process_t** find_all_processes(char* fpath)`
-			- *Status:* Done
+			- *Status:* DONE, TESTED
 			- *Functionality:* Finds all processes and blocks which these processes have in the file
 		- `unsigned long int read_next(process_t* process)`
-			- *Status:* INP
+			- *Status:* DONE, TESTED
 			- *Functionality:* Reads the next memory reference for the process
 
 - **process.h**
 	- *Summary:* Stores the info for each process, including page table, etc.
-	- *Status:* INP
+	- *Status:* DONE, TESTED
 	- *Files:* process.h, process.c
 	- *Methods:*
 		- `unsigned long int is_waiting(process_t* process, unsigned long int clock)`
-			- *Status:* Done
+			- *Status:* DONE, TESTED
 			- *Functionality:* Determines if a process is waiting or not
 		- `process_t* create_process(unsigned long int pid);`
-			- *Status:* Done
+			- *Status:* DONE, TESTED
 			- *Functionality:* Creates a process and initializes struct members
 
 - **page_table.h**
@@ -67,19 +67,19 @@
 	- *Files:* page_table.h, page_table.c
 	- *Methods:*
 		- `page_table_t* create_page_table(unsigned long int size)`
-			- *Status:* Done
+			- *Status:* DONE, TESTED
 			- *Functionality:* Creates a page table and initializes struct members
 		- `page_t* get_from_ptable(page_table_t* table, unsigned long int pid, unsigned long int vpn)`
-			- *Status:* INP
+			- *Status:* DONE, TESTED
 			- *Functionality:* Gets the page from the page table with the corresponding vpn
 		- `void add_to_ptable(page_table_t* ptable, page_t* page)`
-			- *Status:* INP
+			- *Status:* DONE, TESTED
 			- *Functionality:* Adds a new page to the page table
 		- `page_t* remove_from_ptable(page_table_t* ptable, page_t* page)`
-			- *Status:* INP
+			- *Status:* DONE, TESTED
 			- *Functionality:* Removes a page from the page table
 		- `unsigned long int hash_ptable(page_table_t* table, page_t* page)`
-			- *Status:* INP
+			- *Status:* DONE, TESTED
 			- *Functionality:* Hashes a page to the corresponding index in the page table
 
 
@@ -89,16 +89,16 @@
 	- *Files:* disk.c, disk.h
 	- *Methods:*
 		- `disk_t* create_disk(int size)`
-			- *Status:* INP
+			- *Status:* DONE, TESTED
 			- *Functionality:* Creates disk and initializes struct members
 		- `void add_page_to_disk(disk_t* disk, page_t* page)`
-			- *Status:* INP
+			- *Status:* DONE, TESTED
 			- *Functionality:* Adds a page to the disk queue
 		- `page_t* remove_page_from_disk(disk_t* disk)`
-			- *Status:* INP
+			- *Status:* DONE, TESTED
 			- *Functionality:* Removes a page from the disk queue
 		- `unsigned long int is_ready(disk_t* disk, unsigned long int clock)`
-			- *Status:* INP
+			- *Status:* DONE, TESTED
 			- *Functionality:* Determines if the disk is ready to start another I/O operation
 
 - **inverted_page_table.h**
@@ -130,22 +130,22 @@
 	- *Files:* process_queue.h, process_queue.c
 	- *Methods:*
 		- `ready_blocked_queues_t* create_ready_blocked_queues(int size, process_t** ready_queue)`
-			- *Status:* Done
+			- *Status:* DONE, TESTED
 			- *Functionality:* Creates the ready and blocked queues system and initializes struct members
 		- `process_queue_t* create_process_queue(int size)`
-			- *Status:* Done
+			- *Status:* DONE, TESTED
 			- *Functionality:* Creates an individual queue (ready or blocked) for the ready-blocked system
 		- `process_t* get_next_process(ready_blocked_queues_t* queue)`
-			- *Status:* INP
+			- *Status:* DONE, TESTED
 			- *Functionality:* Gets the next ready process
 		- `void update_queues(ready_blocked_queues_t* queue, unsigned long int clock)`
-			- *Status:* Done
+			- *Status:* DONE, TESTED
 			- *Functionality:* Moves the first element in blocked to ready if it is ready
 		- `void move_to_blocked(ready_blocked_queues_t* queue)`
-			- *Status:* Done
+			- *Status:* DONE, TESTED
 			- *Functionality:* Moves a process to the blocked queue
 		- `void add_to_ready(ready_blocked_queues_t* queues)`
-			- *Status:* Done
+			- *Status:* DONE, TESTED
 			- *Functionality:* Moves a process to the ready queue
 
 

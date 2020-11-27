@@ -42,6 +42,6 @@ unsigned long int is_waiting(process_t* process, unsigned long int clock);
  * @param pid - the pid of the process
  * @return    - a pointer to the new process struct
  */
-process_t* create_process(unsigned long int pid);
+process_t* create_process(unsigned long int pid, unsigned long int page_table_size);
 
 #endif

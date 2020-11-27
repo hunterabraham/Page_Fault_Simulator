@@ -46,6 +46,7 @@ ready_blocked_queues_t* create_ready_blocked_queues(int size,  process_t** ready
 	}
 	rb_q->ready_queue = ready;
 	rb_q->blocked_queue = blocked;
+	rb_q->num_procs = i;
 	return rb_q;
 }
 
@@ -111,13 +112,6 @@ void move_to_blocked(ready_blocked_queues_t* queue) {
 }
 
 
-
-
-
-
-
-
-
-
-
-
+process_t* peek_ready(ready_blocked_queues_t* queues) {
+	return queues->ready_queue->process_array[queues->ready_queue->begin];
+}

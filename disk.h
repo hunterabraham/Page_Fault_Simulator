@@ -1,17 +1,9 @@
-#include "statistics.h"
+#ifndef DISK_H
+#define DISK_H
 
-/**
- * Queue of completion times. Peek at first element. If <= clock, remove from queue of completion
- * times. Send page to page table (global and process). If disk isn't empty, next completion time
- * = clock + 2000. If it is full, add_to_disk will handle completion time.
- */
-typedef struct completion_times {
-	unsigned long int** times;
-	unsigned long int begin;
-	unsigned long int end;
-	unsigned long int curr_size;
-	unsigned long int max_size;
-} completion_times;
+#include "statistics.h"
+#include "page_table.h"
+
 
 
 /**
@@ -43,7 +35,7 @@ disk_t* create_disk(int size);
  * @param disk - the disk being added to
  * @param page - the page being added to the disk
  */
-void add_page_to_disk(disk_t* disk, page_t* page);
+void add_page_to_disk(disk_t* disk, page_t* page, unsigned long int clock);
 
 /**
  * removes the page at the beginning of the queue from the disk
@@ -51,7 +43,7 @@ void add_page_to_disk(disk_t* disk, page_t* page);
  * @param disk - the disk being removed from
  * @return     - the page that is removed (the first one in the queue)
  */
-page_t* remove_page_from_disk(disk_t* disk);
+page_t* remove_page_from_disk(disk_t* disk, unsigned long int clock);
 
 /**
  * Checks to see if the disk has completed its I/O and is ready
@@ -61,3 +53,5 @@ page_t* remove_page_from_disk(disk_t* disk);
  * @return      - 1 if ready, 0 if not ready
  */
 unsigned long int is_ready(disk_t* disk, unsigned long int clock);
+
+#endif

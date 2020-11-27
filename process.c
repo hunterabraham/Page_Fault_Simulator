@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include "process.h"
 
-process_t* create_process(unsigned long int pid) {
+process_t* create_process(unsigned long int pid, unsigned long int page_table_size) {
 	unsigned long int BUFSIZE = 4096;
 	process_t* new_proc = (process_t*)malloc(sizeof(process_t));
 	if (NULL == new_proc) {
@@ -13,7 +13,7 @@ process_t* create_process(unsigned long int pid) {
 	new_proc->time_when_ready = 0;
 	new_proc->first_ref = 0;
 	new_proc->last_ref = 0;
-	new_proc->page_table = (page_table_t*)malloc(sizeof(page_table_t));
+	new_proc->page_table = create_page_table(page_table_size);
 	if (NULL == new_proc->page_table) {
 		fprintf(stderr, "Error allocating page_table in create_process() in process.c\n");
 		exit(1);

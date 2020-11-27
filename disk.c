@@ -3,65 +3,73 @@
 #include "disk.h"
 #include "statistics.h"
 
-int isIn(disk* disk_t, memref* ref) { // can modify into R-B Tree later for O(logN)
-	for (int i = disk_t->begin; i < disk_t->begin +  disk_t->curr_size; ++i) {
-		if (i >= disk_t->max_size) {
-			break;
-		}
-		if (disk_t->ref_queue[i]->page_no == ref->page_no && disk_t->ref_queue[i]->pid == ref->pid) {
-			return 1;
-		}
-	}
-	return 0;
-}
-
-int add_ref_disk(disk* disk_t, memref* ref, int clock, stats_t* stats) {
-	if (disk_t->max_size == disk_t->curr_size) { 
-		fprintf(stderr, "Disk queue full all %d/%d spots occupied. Memory reference skipped.\n", disk_t->curr_size, disk_t->max_size);
-		return 0;
-	}
-	if (isIn(disk_t, ref)) { // if request already queued, ignore
-		return 1;
-	}
-	// add the element to the queue and update the counter
-	stats->total_page_faults++;
-	disk_t->ref_queue[disk_t->end] = ref;
-	disk_t->curr_size++;
-	disk_t->end = (disk_t->end + 1) % disk_t->max_size;
-	ref->proc->time_when_ready = clock + 2000;
-	
-	return 1;
-}
 
 
-memref* remove_ref_disk(disk* disk_t) {
-	if(disk_t->curr_size == 0) { // wait for the queue to have elements
-		return NULL;
-	}
-	memref* ref = disk_t->ref_queue[disk_t->begin];
-	disk_t->curr_size--;
-	disk_t->begin = (disk_t->begin + 1) % disk_t->max_size;
-	return ref;
-}
 
-
-disk* create_disk(int size) {
-	// allocate struct
-	disk* new_disk = malloc(sizeof(disk));
+/**
+ * Creates a disk of size size and initializes all members
+ * 
+ * @param size - the current size of the disk
+ * @return     - a pointer to the new disk
+ */
+disk_t* create_disk(int size) {
+	disk_t* new_disk = malloc(sizeof(disk_t));
 	if (NULL == new_disk) {
-		fprintf(stderr, "Error allocating new_disk in create_disk in disk.c\n");
+		fprintf(stderr, "Error allocating new_disk in create_disk() in disk.c\n");
 		exit(1);
 	}
-	// initialize struct
-	new_disk->ref_queue = malloc(sizeof(memref) * size);
-	new_disk->begin = 0;
-	new_disk->end = 0;
-	new_disk->curr_size = 0;
-	new_disk->max_size = size;
+	new_disk->page_array = malloc(sizeof(page_t) * size);
 	new_disk->num_faults = 0;
 	new_disk->next_time_for_access = 0;
+	new_disk->curr_size = 0;
+	new_disk->begin = 0;
+	new_disk->end = 0;
+	new_disk->max_size = size;
 	return new_disk;
 }
 
+/**
+ * Adds a page to the disk 
+ * 
+ * @param disk - the disk being added to
+ * @param page - the page being added to the disk
+ */
+void add_page_to_disk(disk_t* disk, page_t* page, unsigned long int clock) {
+	if (disk->curr_size == 0) {
+		disk->next_time_for_access = clock + 2000;
+	}
+	disk->page_array[disk->end] = page;
+	disk->end = (disk->end + 1) % disk->max_size;
+	disk->curr_size++;
+}
 
+/**
+ * removes the page at the beginning of the queue from the disk
+ * 
+ * @param disk - the disk being removed from
+ * @return     - the page that is removed (the first one in the queue)
+ */
+page_t* remove_page_from_disk(disk_t* disk, unsigned long int clock) {
+	if (disk->curr_size != 0) {
+		disk->next_time_for_access = clock + 2000;
+	}
+	page_t* page = disk->page_array[disk->begin];
+	disk->begin = (disk->begin + 1) % disk->max_size;
+	disk->curr_size--;
+	
+	return page;
+}
 
+/**
+ * Checks to see if the disk has completed its I/O and is ready
+ * 
+ * @param disk  - the disk to check if its ready
+ * @param clock - the clock to compare to
+ * @return      - 1 if ready, 0 if not ready
+ */
+unsigned long int is_ready(disk_t* disk, unsigned long int clock) {
+	if (disk->next_time_for_access <= clock) {
+		return 1;
+	}
+	return 0;
+}

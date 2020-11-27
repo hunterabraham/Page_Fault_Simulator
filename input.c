@@ -5,7 +5,6 @@
 #include "input.h"
 #include "process.h"
 
-
 long int contains(process_t** pinfo_list, unsigned long int pid) {
 	long int i = 0;
 	if (NULL == pinfo_list) {
@@ -51,7 +50,7 @@ unsigned long int* split(char* buffer) {
 }
 
 
-process_t** find_all_processes(char* fpath) {
+process_t** find_all_processes(char* fpath, unsigned long int page_table_size) {
 	const unsigned long int BUFSIZE = 10000;
 	// holds all processes
 	process_t** process_list = malloc(sizeof(process_t) * BUFSIZE);
@@ -71,16 +70,19 @@ process_t** find_all_processes(char* fpath) {
 	}
 	unsigned long int process_list_idx = 0;
 	unsigned long int curr_row = 0;
+	unsigned long int curr_num_bytes = 0;
 	while(NULL != fgets(buffer, BUFSIZE, trace_file)) {
+		curr_num_bytes += strlen(buffer);
 		unsigned long int* ret_arr = split(buffer);
+		
 		unsigned long int pid = ret_arr[1];
 		long int idx = contains(process_list, pid); // see if process is in list
 		if (idx == -1) { // if it isn't, make a new one and add it to the list
-			process_t* new_proc = create_process(pid); // TODO: initialize struct members
+			process_t* new_proc = create_process(pid, page_table_size); // TODO: initialize struct members
 			new_proc->first_ref = curr_row;
 			new_proc->last_ref = curr_row;
-			new_proc->blocks[new_proc->num_blocks].start = curr_row;
-			new_proc->blocks[new_proc->num_blocks].end = curr_row;
+			new_proc->blocks[new_proc->num_blocks].start = curr_num_bytes;
+			new_proc->blocks[new_proc->num_blocks].end = curr_num_bytes;
 			new_proc->blocks[new_proc->num_blocks].curr_line = 0;
 			new_proc->num_blocks++;
 			new_proc->fptr = fopen(fpath, "r");
@@ -93,12 +95,12 @@ process_t** find_all_processes(char* fpath) {
 		} else { // process already in table, update row and potentially create new block / update block
 			process_t* curr_proc = process_list[idx];
 			if (curr_proc->last_ref != curr_row - 1) { // if not a continuation of old block, make new one
-				curr_proc->blocks[curr_proc->num_blocks].start = curr_row;
-				curr_proc->blocks[curr_proc->num_blocks].end = curr_row;
+				curr_proc->blocks[curr_proc->num_blocks].start = curr_num_bytes;
+				curr_proc->blocks[curr_proc->num_blocks].end = curr_num_bytes;
 				curr_proc->blocks[curr_proc->num_blocks].curr_line = 0;
 				curr_proc->num_blocks++;
 			} else { // still on the same block
-				curr_proc->blocks[curr_proc->num_blocks - 1].end = curr_row;
+				curr_proc->blocks[curr_proc->num_blocks - 1].end = curr_num_bytes;
 			}
 			curr_proc->last_ref = curr_row;
 		}
@@ -110,25 +112,34 @@ process_t** find_all_processes(char* fpath) {
 }
 
 
-unsigned long int read_next(process_t* process) {
+page_t* read_next(process_t* process) {
 	unsigned long int BUFSIZE = 1000;
 	char* BUFFER = malloc(sizeof(char) * BUFSIZE);
 	char* result;
-	while (1) {
+	while (1) { // FIXME
 		result = fgets(BUFFER, BUFSIZE, process->fptr);
 		unsigned long int* res_array = split(result);
 		unsigned long int pid = res_array[1];
 		if (pid != process->pid) { // done with current block, move to next one
 			if (process->curr_block_idx == process->num_blocks - 1) {
-				// TODO: free processes' memory
+				return NULL;
 			}
-			block_t curr_block = process->blocks[process->curr_block_idx + 1]; // FIXME what if we're at the last block?
-			int next_idx = curr_block.start;
 			process->curr_block_idx++;
-			fseek(process->fptr, next_idx, SEEK_SET); // move to next block in file
+			block_t curr_block = process->blocks[process->curr_block_idx]; // FIXME what if we're at the last block?
+			int next_idx = curr_block.start;
+			fseek(process->fptr, (next_idx), SEEK_SET); // move to next block in file
 			continue;
 		}
 		unsigned long int vpn = res_array[0];
-		return vpn;
+		unsigned long int this_pid = res_array[1];
+		page_t* new_page = malloc(sizeof(page_t));
+		if (NULL == new_page) {
+			fprintf(stderr, "Error allocating new_page in read_next() in input.c\n");
+			exit(1);
+		}
+		new_page->pid = this_pid;
+		new_page->vpn = vpn;
+		new_page->page_table_idx = -1;
+		return new_page;
 	}
 }

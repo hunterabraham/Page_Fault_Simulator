@@ -14,12 +14,19 @@ int main(int argc, char** argv) {
 	cmd_args* args = process_args(argc, argv);
 	unsigned long int page_table_size = args->real_mem_size / args->page_size;
 	char* fpath = args->file_name;
-	process_t** list_of_procs = find_all_processes(fpath);
+	process_t** list_of_procs = find_all_processes(fpath, page_table_size);
 	ready_blocked_queues_t* queues = create_ready_blocked_queues(BUFSIZE, list_of_procs);
 	unsigned long int clock = 0;
-	
-	update_queues(queues, clock);
-
+	unsigned long int num_finished_procs = 0;
+	while(num_finished_procs != queues->num_procs) {
+		process_t* curr_proc = peek_ready(queues);
+		page_t* new_page = read_next(curr_proc); // TODO: have to check if NULL
+		if (is_in_ptable(curr_proc->page_table, new_page)) {
+			continue;
+		} else { // page is not in table
+			add_to_disk
+		}
+	}
 	
 
 	/*

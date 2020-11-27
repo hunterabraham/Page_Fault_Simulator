@@ -21,6 +21,7 @@ typedef struct process_queue_t {
 typedef struct ready_blocked_queues_t {
 	process_queue_t* ready_queue;
 	process_queue_t* blocked_queue;
+	unsigned long int num_procs;
 } ready_blocked_queues_t;
 
 /**
@@ -69,8 +70,13 @@ void update_queues(ready_blocked_queues_t* queue, unsigned long int clock);
 void move_to_blocked(ready_blocked_queues_t* queue);
 
 
-
-
+/**
+ * Peeks at the next ready process
+ * 
+ * @param queues - the ready and blocked queues system
+ * @return       - the next ready process
+ */
+process_t* peek_ready(ready_blocked_queues_t* queues);
 
 
 

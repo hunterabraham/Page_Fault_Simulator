@@ -15,7 +15,7 @@
  * @return           - a reference to a memref struct
  */
 
-unsigned long int read_next(process_t* process);
+page_t* read_next(process_t* process);
 
 
 /**
@@ -26,6 +26,6 @@ unsigned long int read_next(process_t* process);
  * @param fpath     - the file path trace_file
  * @return          - an array of processes
  */
-process_t** find_all_processes(char* fpath);
+process_t** find_all_processes(char* fpath, unsigned long int page_table_size);
 
 #endif
