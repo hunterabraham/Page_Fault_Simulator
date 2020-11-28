@@ -11,7 +11,7 @@ stats_t* init_stats() {
 		fprintf(stderr, "Error allocating stats in initStats() in statistics.c\n");
 		exit(1);
 	}
-	stats->sum_page_frames = 0;
+	stats->sum_page_frames = 0.0;
 	stats->average_memory_utilization = 0.0;
 	stats->sum_runnable_processes = 0;
 	stats->average_runnable_processes = 0.0;

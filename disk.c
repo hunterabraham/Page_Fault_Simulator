@@ -36,7 +36,7 @@ disk_t* create_disk(int size) {
  */
 void add_page_to_disk(disk_t* disk, page_t* page, unsigned long int clock) {
 	if (disk->curr_size == 0) {
-		disk->next_time_for_access = clock + 2000;
+		disk->next_time_for_access = clock + 2000000;
 	}
 	disk->page_array[disk->end] = page;
 	disk->end = (disk->end + 1) % disk->max_size;
@@ -51,7 +51,7 @@ void add_page_to_disk(disk_t* disk, page_t* page, unsigned long int clock) {
  */
 page_t* remove_page_from_disk(disk_t* disk, unsigned long int clock) {
 	if (disk->curr_size != 0) {
-		disk->next_time_for_access = clock + 2000;
+		disk->next_time_for_access = clock + 2000000;
 	}
 	page_t* page = disk->page_array[disk->begin];
 	disk->begin = (disk->begin + 1) % disk->max_size;

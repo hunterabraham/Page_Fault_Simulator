@@ -151,7 +151,7 @@ process_t* peek_ready(ready_blocked_queues_t* queues) {
 process_t* search_for_process(ready_blocked_queues_t* queues, unsigned long int pid) {
 	process_queue_t* ready = queues->ready_queue;
 	unsigned long int i = ready->begin;
-	while(ready->process_array[i] != NULL) {
+	while(ready->process_array[i] != NULL) { // BOTTLENECK??
 		if (ready->process_array[i]->pid == pid) {
 			return ready->process_array[i];
 		}

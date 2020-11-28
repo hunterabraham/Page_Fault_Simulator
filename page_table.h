@@ -1,6 +1,6 @@
 #ifndef PTABLE_H
 #define PTABLE_H
-
+#include <search.h>
 
 // page to be held in page table
 typedef struct page_t {

@@ -32,7 +32,6 @@ int main(int argc, char** argv) {
 	while(num_finished_procs != queues->num_procs) { //|| disk->curr_size != 0) { // FIXME: most likely wrong
 		process_t* curr_proc = peek_ready(queues);
 		if (curr_proc != NULL) {
-			stats->total_memory_references += 1;
 			page_t* new_page = read_next(curr_proc); // TODO: have to check if NULL
 			if (new_page == NULL) {
 				num_finished_procs++;
@@ -52,25 +51,27 @@ int main(int argc, char** argv) {
 		}
 		if (is_ready(disk, clock)) {
 			page_t* page_to_add = remove_page_from_disk(disk, clock);
-			if (num_pages >= num_page_tables) { // if page table is full, evict page
-				page_t* page_to_remove = pop_from_fifo_queue(fifo_queue);
-				process_t* process_of_page = search_for_process(queues, page_to_remove->pid);
-				remove_from_ptable(process_of_page->page_table, page_to_remove);
-				num_pages--;
+			if (page_to_add != NULL) {
+				if (num_pages >= num_page_tables) { // if page table is full, evict page
+					page_t* page_to_remove = pop_from_fifo_queue(fifo_queue);
+					process_t* process_of_page = search_for_process(queues, page_to_remove->pid); // BOTTLENECK
+					remove_from_ptable(process_of_page->page_table, page_to_remove);
+					num_pages--;
+				}
+				process_t* process_of_add_page = search_for_process(queues, page_to_add->pid); // BOTTLENECK
+				add_to_ptable(process_of_add_page->page_table, page_to_add);
+				add_to_ready(queues);
+				push_to_fifo_queue(fifo_queue, page_to_add);
+				num_pages++;
 			}
-			process_t* process_of_add_page = search_for_process(queues, page_to_add->pid);
-			add_to_ptable(process_of_add_page->page_table, page_to_add);
-			add_to_ready(queues);
-			push_to_fifo_queue(fifo_queue, page_to_add);
-			num_pages += 1;
 		}
-		stats->sum_page_frames += num_pages;
-		stats->sum_runnable_processes += queues->ready_queue->curr_size;
 
-		//update_queues(queues, clock);
+		stats->sum_page_frames += ((double)num_pages) / ((double)num_page_tables);
+		stats->sum_runnable_processes += queues->ready_queue->curr_size;
 		clock++;
 	}
-	stats->average_memory_utilization = ((double)(((double)stats->sum_page_frames) / ((double)clock) / ((double)num_page_tables)));
+
+	stats->average_memory_utilization = ((double)(((double)stats->sum_page_frames) / ((double)clock)));
 	stats->average_runnable_processes = ((double)(((double)stats->sum_runnable_processes) / ((double)clock)));
 	print_stats(stats, clock);
 
