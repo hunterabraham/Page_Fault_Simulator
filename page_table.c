@@ -43,6 +43,9 @@ page_table_t* create_page_table(unsigned long int size) {
  */ 
 unsigned long int add_to_ptable(page_table_t* ptable, page_t* page) {
     unsigned long int index = hash_ptable(ptable, page);
+    if (!ptable->free_list[index]) {
+        fprintf(stderr, "CONFLICT\n");
+    }
     ptable->free_list[index] = 0;
     ptable->page_array[index] = page;
     page->page_table_idx = index;
