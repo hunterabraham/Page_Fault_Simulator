@@ -42,7 +42,13 @@ int compare_pages(const void* page1, const void* page2) {
  * @param page   - the page being added
  */ 
 unsigned long int add_to_ptable(page_table_t* ptable, page_t* page) {
-    tsearch((void *)page, (void **)&ptable->root, compare_pages);
+    void* ret;
+    page_t* page_ret; 
+    ret = tsearch((void *)page, (void **)&ptable->root, compare_pages);
+    page_ret = (page_t*) ret;
+    if (ret != page_ret) {
+        free(page);
+    }
     ptable->curr_size++;
     return 0;
 }
@@ -58,7 +64,6 @@ unsigned long int add_to_ptable(page_table_t* ptable, page_t* page) {
  * @return       - the page if found, otherwise NULL
  */
 void remove_from_ptable(page_table_t* ptable, page_t* page) {
-    //tdelete((void*)page, (void**)&ptable->root, compare_pages);
     tdelete(page, (void**)&ptable->root, compare_pages);
     ptable->curr_size--;
     free(page);
@@ -78,12 +83,10 @@ unsigned long int hash_ptable(page_table_t* table, page_t* page) {
 }
 
 unsigned long int is_in_ptable(page_table_t* table, page_t* page) {
-    //fprintf(stderr, "%ld\n", page->vpn);
     void* found_page;
     found_page = tfind((void*)page, (void**)&table->root, compare_pages);
     page_t* found_page_page = (page_t*) found_page;
     if (found_page_page != NULL) {
-        //fprintf(stderr, "%ld\n", (found_page_page)->vpn);
         return 1;
     }
     return 0;
@@ -101,4 +104,5 @@ void free_node(void *ptr) {
 
 void free_ptable(page_table_t* table) {
     tdestroy(table->root, free_node);
+    free(table);
 }

@@ -58,7 +58,7 @@ process_t** find_all_processes(char* fpath, unsigned long int page_table_size) {
 		fprintf(stderr, "Error allocating pinfo_list in findAllProcesses() in input.c\n");
 		exit(1);
 	}
-	char* buffer = malloc(sizeof(char) * BUFSIZE);
+	char buffer[BUFSIZE];
 	if (NULL == buffer) {
 		fprintf(stderr, "Error allocating buffer in findAllProcesses() in input.c\n");
 		exit(1);
@@ -77,7 +77,6 @@ process_t** find_all_processes(char* fpath, unsigned long int page_table_size) {
 		unsigned long int pid = ret_arr[1];
 		long int idx = contains(process_list, pid); // see if process is in list
 		if (idx == -1) { // if it isn't, make a new one and add it to the list
-			
 			process_t* new_proc = create_process(pid, page_table_size);
 			new_proc->first_ref = curr_row; // mark the first reference
 			new_proc->last_ref = curr_row;
@@ -110,7 +109,6 @@ process_t** find_all_processes(char* fpath, unsigned long int page_table_size) {
 
 		free(ret_arr);
 	}
-	free(buffer);
 	fclose(trace_file);
 	return process_list;
 }
@@ -118,12 +116,11 @@ process_t** find_all_processes(char* fpath, unsigned long int page_table_size) {
 
 page_t* read_next(process_t* process) {
 	unsigned long int BUFSIZE = 1000;
-	char* BUFFER = malloc(sizeof(char) * BUFSIZE);
-	char* result;
-	while (1) { // FIXME
+	char BUFFER[BUFSIZE];
+	char* result = NULL;
+	while (1) { 
 		result = fgets(BUFFER, BUFSIZE, process->fptr);
 		if (result == NULL) {
-			free(BUFFER);
 			return NULL;
 		}
 		unsigned long int num_bytes = strlen(BUFFER);
@@ -131,7 +128,6 @@ page_t* read_next(process_t* process) {
 		unsigned long int pid = res_array[1];
 		if (pid != process->pid) { // done with current block, move to next one
 			if (process->curr_block_idx == process->num_blocks - 1) {
-				free(BUFFER);
 				free(res_array);
 				return NULL;
 			}
@@ -153,7 +149,6 @@ page_t* read_next(process_t* process) {
 		new_page->vpn = vpn;
 		new_page->page_table_idx = -1;
 		new_page->num_bytes = num_bytes;
-		free(BUFFER);
 		free(res_array);
 		return new_page;
 	}
