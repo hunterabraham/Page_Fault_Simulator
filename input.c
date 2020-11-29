@@ -50,7 +50,7 @@ unsigned long int* split(char* buffer) {
 }
 
 
-process_t** find_all_processes(char* fpath, unsigned long int page_table_size) {
+process_t** find_all_processes(char* fpath, unsigned long int page_table_size, unsigned long int* num_mem_refs) {
 	const unsigned long int BUFSIZE = 10000;
 	// holds all processes
 	process_t** process_list = malloc(sizeof(process_t) * BUFSIZE);
@@ -110,6 +110,7 @@ process_t** find_all_processes(char* fpath, unsigned long int page_table_size) {
 		free(ret_arr);
 	}
 	fclose(trace_file);
+	*num_mem_refs = curr_row; // FIXME
 	return process_list;
 }
 

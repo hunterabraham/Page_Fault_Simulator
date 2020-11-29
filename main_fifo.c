@@ -16,8 +16,11 @@ int main(int argc, char** argv) {
 	unsigned long int num_page_tables = args->real_mem_size / args->page_size;
 	char* fpath = args->file_name;
 	// do first pass over trace file to build process list
-	
-	process_t** list_of_procs = find_all_processes(fpath, num_page_tables);
+	unsigned long int* num_mem_refs = malloc(sizeof(int));
+	if (num_mem_refs == NULL) {
+		fprintf(stderr, "Error allocating num_mem_refs in main_fifo.c\n");
+	}
+	process_t** list_of_procs = find_all_processes(fpath, num_page_tables, num_mem_refs);
 	// build ready and blocked queues for the processes
 	ready_blocked_queues_t* queues = create_ready_blocked_queues(BUFSIZE, list_of_procs);
 	// initialize disk & statistics
@@ -26,14 +29,10 @@ int main(int argc, char** argv) {
 	unsigned long int clock = 0;
 	unsigned long int num_finished_procs = 0;
 	unsigned long int num_pages = 0;
-	// unsigned long int* num_mem_refs = malloc(sizeof(int));
-	// if (num_mem_refs == NULL) {
-	// 	fprintf(s)
-	// }
+	
 	fifo_queue_t* fifo_queue = create_fifo_queue(1000000);
-	fprintf(stderr, "%ld\n", queues->num_procs);
 	// MAIN LOOP
-	while(num_finished_procs < queues->num_procs) { 
+	while(*num_mem_refs > stats->total_memory_references) { 
 		process_t* curr_proc = peek_ready(queues);
 		if (curr_proc != NULL) {
 			page_t* new_page = read_next(curr_proc); 
@@ -47,6 +46,10 @@ int main(int argc, char** argv) {
 			if (is_in_ptable(curr_proc->page_table, new_page)) {
 				stats->total_memory_references += 1;
 				free(new_page);
+				if (*num_mem_refs == stats->total_memory_references) {
+					num_pages -= move_to_finished(queues);
+				}
+				num_finished_procs++;
 			} else { // page is not in table
 				// have to move process' pointer back one
 				fseek(curr_proc->fptr, -1 * ((int)new_page->num_bytes), SEEK_CUR);
@@ -76,7 +79,6 @@ int main(int argc, char** argv) {
 		stats->sum_runnable_processes += queues->ready_queue->curr_size;
 		clock++;
 	}
-
 	stats->average_memory_utilization = ((double)(((double)stats->sum_page_frames) / ((double)clock)));
 	stats->average_runnable_processes = ((double)(((double)stats->sum_runnable_processes) / ((double)clock)));
 	print_stats(stats, clock);
@@ -85,4 +87,5 @@ int main(int argc, char** argv) {
 	free_queue(fifo_queue);
 	free(stats);
 	free(args);
+	free(num_mem_refs);
 }

@@ -26,6 +26,6 @@ page_t* read_next(process_t* process);
  * @param fpath     - the file path trace_file
  * @return          - an array of processes
  */
-process_t** find_all_processes(char* fpath, unsigned long int page_table_size);
+process_t** find_all_processes(char* fpath, unsigned long int page_table_size, unsigned long int* num_mem_refs);
 
 #endif

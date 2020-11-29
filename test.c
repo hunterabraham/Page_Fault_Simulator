@@ -7,7 +7,7 @@
 #include "page_table.h"
 #include "disk.h"
 #include "process_queue.h"
-
+#include "fifo.h"
 void test_moving_queues(ready_blocked_queues_t* queues) {
     process_queue_t* ready = queues->ready_queue;
     process_queue_t* blocked = queues->blocked_queue;
@@ -202,29 +202,7 @@ void test_get_next(ready_blocked_queues_t* queues) {
 }
 
 void test_ptable() {
-    page_table_t* page_table = create_page_table(4096);
-    page_t* new_page = malloc(sizeof(page_t));
-    new_page->vpn = 1000;
-    new_page->pid = 1000;
-    fprintf(stderr, "%ld\n", page_table->free_list[1000]);
 
-    add_to_ptable(page_table, new_page);
-    fprintf(stderr, "%ld\n", page_table->page_array[new_page->page_table_idx]->vpn);
-    fprintf(stderr, "%ld\n", page_table->free_list[new_page->page_table_idx]);
-    page_t* new_page_2 = malloc(sizeof(page_t));
-    new_page_2->vpn = 5000;
-    new_page_2->pid = 1000;
-    fprintf(stderr, "%ld\n", page_table->free_list[904]);
-
-    add_to_ptable(page_table, new_page_2);
-
-    fprintf(stderr, "%ld\n", page_table->page_array[new_page_2->page_table_idx]->vpn);
-    fprintf(stderr, "%ld\n", page_table->free_list[new_page_2->page_table_idx]);
-    remove_from_ptable(page_table, new_page_2);
-    fprintf(stderr, "%ld\n", page_table->free_list[new_page_2->page_table_idx]);
-    unsigned long int is_in = is_in_ptable(page_table, new_page);
-    unsigned long int is_in_2 = is_in_ptable(page_table, new_page_2);
-    fprintf(stderr, "Should be (1, 0): (%ld, %ld)\n", is_in, is_in_2);
 }
 
 void test_disk() {
@@ -279,7 +257,7 @@ void test_ptable_2() {
     page4->pid = 28328;
     unsigned long int ret4 = is_in_ptable(page_table, page4);
     fprintf(stderr, "%ld\n", ret4);
-    
+
 }
 
 
@@ -291,12 +269,32 @@ void test_ptable_tree() {
     add_to_ptable(page_table, new_page);
 }
 
+void test_fifo_queue() {
+    fifo_queue_t* fifo_queue = create_fifo_queue(1000);
+    
+
+    for (int i = 0; i < 183; i++) {
+        page_t* new_page = malloc(sizeof(page_t));
+        new_page->vpn = 1000 + i;
+        new_page->pid = 1000;
+        push_to_fifo_queue(fifo_queue, new_page);
+    }
+    page_t* ret = pop_from_fifo_queue(fifo_queue);
+    fprintf(stderr, "%ld\n", ret->vpn);
+    for (int i = 0; i < 50; i++) {
+        pop_from_fifo_queue(fifo_queue);
+    }
+    ret = pop_from_fifo_queue(fifo_queue);
+    fprintf(stderr, "%ld\n", ret->vpn);
+}
+
 int main(int argc, char** argv) {
 	const unsigned long int BUFSIZE = 4096;
 	cmd_args* args = process_args(argc, argv);
 	unsigned long int page_table_size = args->real_mem_size / args->page_size;
 	char* fpath = args->file_name;
-	process_t** list_of_procs = find_all_processes(fpath, BUFSIZE);
+    unsigned long int* num = malloc(sizeof(int));
+	process_t** list_of_procs = find_all_processes(fpath, BUFSIZE, num);
 	ready_blocked_queues_t* queues = create_ready_blocked_queues(BUFSIZE, list_of_procs);
 	//test_moving_queues(queues); // RUN WITH test/4000.addrtrace
     //test_peek_ready(queues);
@@ -304,6 +302,7 @@ int main(int argc, char** argv) {
     //test_ptable();
     //test_disk();
     //test_find_all_processes(queues);
-    test_ptable_2();
+    //test_ptable_2();
     //test_ptable_tree();
+    test_fifo_queue();
 }

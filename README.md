@@ -62,7 +62,7 @@
 			- *Functionality:* Creates a process and initializes struct members
 
 - **page_table.h**
-	- *Summary:* Stores a page table implemented as a hash map
+	- *Summary:* Stores a page table implemented as a binary tree
 	- *Status:* INP
 	- *Files:* page_table.h, page_table.c
 	- *Methods:*
@@ -78,10 +78,6 @@
 		- `page_t* remove_from_ptable(page_table_t* ptable, page_t* page)`
 			- *Status:* DONE, TESTED
 			- *Functionality:* Removes a page from the page table
-		- `unsigned long int hash_ptable(page_table_t* table, page_t* page)`
-			- *Status:* DONE, TESTED
-			- *Functionality:* Hashes a page to the corresponding index in the page table
-
 
 - **disk.h**
 	- *Summary:* Stores all pages being pushed to disk
@@ -100,28 +96,6 @@
 		- `unsigned long int is_ready(disk_t* disk, unsigned long int clock)`
 			- *Status:* DONE, TESTED
 			- *Functionality:* Determines if the disk is ready to start another I/O operation
-
-- **inverted_page_table.h**
-	- *Summary:* Stores ppn-><vpn, pid> mapping in a hash map
-	- *Status:* INP
-	- *Files:* inverted_page_table.h, inverted_table_table.c
-	- *Methods:*
-		- `inverted_ptable_t* create_inverted_page_table(unsigned long int size)`
-			- *Status:* INP
-			- *Functionality:* Creates inverted page table and initializes struct members
-		- `inverted_page_t* get_from_ptable(inverted_ptable_t* table, unsigned long int pid, unsigned long int vpn)`
-			- *Status:* INP
-			- *Functionality:* Gets an inverted page from the inverted page table using ppn hashing
-		- `void add_to_ptable(inverted_ptable_t* ptable, page_t* page)`
-			- *Status:* INP
-			- *Functionality:* Adds an inverted page to the page table
-		- `page_t* remove_from_ptable(inverted_ptable_t* ptable, page_t* page)`
-			- *Status:* INP
-			- *Functionality:* Removes an inverted page from the page table
-		- `unsigned long int hash_inverted_ptable(inverted_page_table_t* table, inverted_page_t* page)`
-			- *Status:* INP
-			- *Functionality:* Hashes an inverted page to an index in the inverted page table
-
 
 
 - **process_queue.h**
@@ -147,10 +121,34 @@
 		- `void add_to_ready(ready_blocked_queues_t* queues)`
 			- *Status:* DONE, TESTED
 			- *Functionality:* Moves a process to the ready queue
+			unsigned long int move_to_finished(ready_blocked_queues_t* queues);
+		- `void free_processes(ready_blocked_queues_t* queues)`
+			- *Status:* DONE, TESTED
+			- *Functionality:* Frees the processes and all of its members, including blocks and page tables
 
 
 
+## Algorithm Modules
+
+### FIFO
+
+- *Summary:* A FIFO queue to handle FIFO page replacement
+- *Status:* DONE, TESTED
+- *Files:* fifo.c, fifo.h
+- *Methods:*
+	- `fifo_queue_t* create_fifo_queue(int size)`
+		- *Status:* DONE, TESTED
+		- *Functionality:* Creates fifo queue and allocates memory
+	- `page_t* pop_from_fifo_queue(fifo_queue_t* queue)`
+		- *Status:* DONE, TESTED
+		- *Functionality:* Pops the first element from the fifo queue
+	- `void push_to_fifo_queue(fifo_queue_t* queue, page_t*)`
+		- *Status:* DONE, TESTED
+		- *Functionality:* Pushes the specified page to the end of the queue
+	- `void free_queue(fifo_queue_t* queue)`
+		- *Status:* DONE, TESTED
+		- *Functionality:* Frees the queue's memory
 
 
 
-
+ 

@@ -54,13 +54,6 @@ unsigned long int add_to_ptable(page_table_t* ptable, page_t* page);
  */
 void remove_from_ptable(page_table_t* ptable, page_t* page);
 
-/**
- * Hash function to index pages into the page table hash map
- *  
- * @param page - the page that is being hashed
- * @return     - the index that results from the hash function
- */
-unsigned long int hash_ptable(page_table_t* table, page_t* page);
 
 /**
  * Determines if a page is in the current page table for this process

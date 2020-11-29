@@ -67,20 +67,8 @@ void remove_from_ptable(page_table_t* ptable, page_t* page) {
     tdelete(page, (void**)&ptable->root, compare_pages);
     ptable->curr_size--;
     free(page);
-
 }
 
-
-/**
- * Hash function to index pages into the page table hash map
- *  
- * @param page - the page that is being hashed
- * @return     - the index that results from the hash function
- */
-unsigned long int hash_ptable(page_table_t* table, page_t* page) {
-    unsigned long int index = (unsigned long int)(page->vpn % table->max_size);
-    return index;
-}
 
 unsigned long int is_in_ptable(page_table_t* table, page_t* page) {
     void* found_page;

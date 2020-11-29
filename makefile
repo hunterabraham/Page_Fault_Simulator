@@ -40,5 +40,5 @@ clean:
 test.o: test.c 
 	gcc -Wall -Wextra -ggdb -c test.c
 
-test: test.o input.o statistics.o cmd_line_processing.o process.o process_queue.o page_table.o disk.o
-	gcc -o test_suite test.o input.o cmd_line_processing.o process.o statistics.o process_queue.o page_table.o disk.o
+test: test.o input.o statistics.o cmd_line_processing.o process.o process_queue.o page_table.o disk.o fifo.o
+	gcc -o test_suite test.o input.o cmd_line_processing.o process.o statistics.o process_queue.o page_table.o disk.o fifo.o
