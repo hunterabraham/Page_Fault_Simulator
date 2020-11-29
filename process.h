@@ -45,4 +45,12 @@ unsigned long int is_waiting(process_t* process, unsigned long int clock);
  */
 process_t* create_process(unsigned long int pid, unsigned long int page_table_size);
 
+
+/**
+ * Frees a process and its allocated memory
+ * 
+ * @param process - the process to be freed
+ */
+void free_process(process_t* process);
+
 #endif

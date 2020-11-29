@@ -12,10 +12,9 @@ typedef struct page_t {
 
 // page table to hold all pages for a process
 typedef struct page_table_t { 
-	page_t** page_array;
+	page_t* root;
 	unsigned long int curr_size;
 	unsigned long int max_size;
-	unsigned long int* free_list; // FIXME might not need this, free list of indices
 } page_table_t;
 
 
@@ -53,7 +52,7 @@ unsigned long int add_to_ptable(page_table_t* ptable, page_t* page);
  * @param ptable - the page table being remove from 
  * @return       - the page if found, otherwise NULL
  */
-page_t* remove_from_ptable(page_table_t* ptable, page_t* page);
+void remove_from_ptable(page_table_t* ptable, page_t* page);
 
 /**
  * Hash function to index pages into the page table hash map
@@ -71,5 +70,12 @@ unsigned long int hash_ptable(page_table_t* table, page_t* page);
  * @return      - 1 if found, 0 otherwise
  */
 unsigned long int is_in_ptable(page_table_t* table, page_t* page);
+
+/**
+ * Frees all the memory allocated for this page table
+ * 
+ * @param table - the table to be freed 
+ */
+void free_ptable(page_table_t* table);
 
 #endif

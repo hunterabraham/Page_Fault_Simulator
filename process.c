@@ -14,10 +14,6 @@ process_t* create_process(unsigned long int pid, unsigned long int page_table_si
 	new_proc->first_ref = 0;
 	new_proc->last_ref = 0;
 	new_proc->page_table = create_page_table(page_table_size);
-	if (NULL == new_proc->page_table) {
-		fprintf(stderr, "Error allocating page_table in create_process() in process.c\n");
-		exit(1);
-	}
 	new_proc->blocks = (block_t*)malloc(sizeof(block_t) * BUFSIZE);
 	if (NULL == new_proc->blocks) {
 		fprintf(stderr, "Error allocating blocks in create_processes() in process.c\n");
@@ -34,4 +30,10 @@ unsigned long int is_waiting(process_t* process, unsigned long int clock) {
 		return 0;
 	}
 	return 1;
+}
+
+void free_process(process_t* process) {
+	free_ptable(process->page_table);
+	free(process->blocks);
+	free(process);
 }

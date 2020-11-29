@@ -17,7 +17,7 @@ cmd_args* process_args(int argc, char** argv) {
 	}
 	int option;
 	argFlags->page_size = 4096;
-	argFlags->real_mem_size = 4194304;
+	argFlags->real_mem_size = 1048576;
 	while((option = getopt(argc, argv, "m:p:")) != -1) {
 		switch(option) {
 			case 'm': // if f is specified, store filename

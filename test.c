@@ -269,8 +269,26 @@ void test_ptable_2() {
     page_t* page3 = malloc(sizeof(page_t));
     page3->vpn = 1039;
     page3->pid = 1000;
-    unsigned long int ret2 = is_in_ptable(page_table, new_page);
+    unsigned long int ret2 = is_in_ptable(page_table, page3);
     fprintf(stderr, "%ld\n", ret2);
+    remove_from_ptable(page_table, page3);
+    unsigned long int ret3 = is_in_ptable(page_table, page3);
+    fprintf(stderr, "%ld\n", ret3);
+    page_t* page4 = malloc(sizeof(page_t));
+    page4->vpn = 1190;
+    page4->pid = 28328;
+    unsigned long int ret4 = is_in_ptable(page_table, page4);
+    fprintf(stderr, "%ld\n", ret4);
+    
+}
+
+
+void test_ptable_tree() {
+    page_table_t* page_table = create_page_table(4096);
+    page_t* new_page = malloc(sizeof(page_t));
+    new_page->vpn = 1000;
+    new_page->pid = 1000;
+    add_to_ptable(page_table, new_page);
 }
 
 int main(int argc, char** argv) {
@@ -287,4 +305,5 @@ int main(int argc, char** argv) {
     //test_disk();
     //test_find_all_processes(queues);
     test_ptable_2();
+    //test_ptable_tree();
 }

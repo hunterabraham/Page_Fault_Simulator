@@ -11,29 +11,29 @@
  * @return     - a pointer to the new page table
  */ 
 page_table_t* create_page_table(unsigned long int size) {
-    page_table_t* page_table = malloc(sizeof(page_table_t)); // FIXME need to free !!
+    page_table_t* page_table = malloc(sizeof(page_table_t)); 
     if (NULL == page_table) {
         fprintf(stderr, "Error allocating page_table in create_page_table() in page_table.c\n");
         exit(1);
     }
-    page_table->page_array = malloc(sizeof(page_t) * size);
-    if (NULL == page_table->page_array) {
-        fprintf(stderr, "Error allocating page_array in create_page_table() in page_table.c\n");
-        exit(1);
-    }
     page_table->curr_size = 0;
     page_table->max_size = size;
-    page_table->free_list = malloc(sizeof(unsigned long int) * size);
-    if (NULL == page_table->free_list) {
-        fprintf(stderr, "Error allocating page_table->free_list in create_page_table() in page_table.c\n");
-        exit(1);
-    }
-    for (unsigned long int i = 0; i < size; i++) {
-        page_table->free_list[i] = (long unsigned int)1;
-    }
+
+    page_table->root = NULL;
     return page_table;
 }
 
+int compare_pages(const void* page1, const void* page2) {
+    //fprintf(stderr, "%ld\n", ((const page_t*)page1)->vpn);
+    //fprintf(stderr, "%ld\n\n\n", ((const page_t*)page2)->vpn);
+    if (((const page_t*)page1)->vpn < ((const page_t*)page2)->vpn) {
+        return -1;
+    }
+    else if (((const page_t*)page1)->vpn > ((const page_t*)page2)->vpn) {
+        return 1;
+    }
+    return 0;
+}
 
 /**
  * Adds a page to the ptable using hash function
@@ -42,15 +42,12 @@ page_table_t* create_page_table(unsigned long int size) {
  * @param page   - the page being added
  */ 
 unsigned long int add_to_ptable(page_table_t* ptable, page_t* page) {
-    unsigned long int index = hash_ptable(ptable, page);
-    if (!ptable->free_list[index]) {
-        fprintf(stderr, "CONFLICT\n");
-    }
-    ptable->free_list[index] = 0;
-    ptable->page_array[index] = page;
-    page->page_table_idx = index;
-    return index;
+    tsearch((void *)page, (void **)&ptable->root, compare_pages);
+    ptable->curr_size++;
+    return 0;
 }
+
+
 
 
 /**
@@ -60,10 +57,14 @@ unsigned long int add_to_ptable(page_table_t* ptable, page_t* page) {
  * @param ptable - the page table being remove from 
  * @return       - the page if found, otherwise NULL
  */
-page_t* remove_from_ptable(page_table_t* ptable, page_t* page) {
-    ptable->free_list[page->page_table_idx] = (unsigned long int)1;
-    return page;
+void remove_from_ptable(page_table_t* ptable, page_t* page) {
+    //tdelete((void*)page, (void**)&ptable->root, compare_pages);
+    tdelete(page, (void**)&ptable->root, compare_pages);
+    ptable->curr_size--;
+    free(page);
+
 }
+
 
 /**
  * Hash function to index pages into the page table hash map
@@ -77,15 +78,27 @@ unsigned long int hash_ptable(page_table_t* table, page_t* page) {
 }
 
 unsigned long int is_in_ptable(page_table_t* table, page_t* page) {
-    page_t* found_page;
-    unsigned long int index = hash_ptable(table, page);
-    found_page = table->page_array[index];
-    if (found_page == NULL) {
-        return 0;
-    }
-    if (page->vpn == found_page->vpn && !table->free_list[index]) {
-            return 1;
+    //fprintf(stderr, "%ld\n", page->vpn);
+    void* found_page;
+    found_page = tfind((void*)page, (void**)&table->root, compare_pages);
+    page_t* found_page_page = (page_t*) found_page;
+    if (found_page_page != NULL) {
+        //fprintf(stderr, "%ld\n", (found_page_page)->vpn);
+        return 1;
     }
     return 0;
-    
+}
+
+/**
+ * Frees a node in the BST  
+ * 
+ * @param ptr - the pointer to the node to be freed
+ */
+void free_node(void *ptr) {
+    page_t* page = ptr;
+    free(page);
+}
+
+void free_ptable(page_table_t* table) {
+    tdestroy(table->root, free_node);
 }

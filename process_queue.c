@@ -116,6 +116,9 @@ void update_queues(ready_blocked_queues_t* queue, unsigned long int clock) {
 
 unsigned long int remove_from_ready(ready_blocked_queues_t* queues) {
 	unsigned long int ret = queues->ready_queue->process_array[queues->ready_queue->begin]->num_pages;
+	free_ptable(queues->ready_queue->process_array[queues->ready_queue->begin]->page_table);
+	free(queues->ready_queue->process_array[queues->ready_queue->begin]->blocks);
+	free(queues->ready_queue->process_array[queues->ready_queue->begin]);
 	queues->ready_queue->begin = (queues->ready_queue->begin + 1) % queues->ready_queue->max_size;
 	queues->ready_queue->curr_size--;
 	return ret;
@@ -135,12 +138,14 @@ void move_to_blocked(ready_blocked_queues_t* queue) {
 	queue->blocked_queue->end = (queue->blocked_queue->end + 1) % queue->blocked_queue->max_size;
 }
 
-void move_to_finished(ready_blocked_queues_t* queue) {
+unsigned long int move_to_finished(ready_blocked_queues_t* queue) {
+	int ret = queue->ready_queue->process_array[queue->ready_queue->begin]->num_pages;
 	queue->finished_queue->process_array[queue->finished_queue->end] = queue->ready_queue->process_array[queue->ready_queue->begin];
 	queue->ready_queue->begin = (queue->ready_queue->begin + 1) % queue->ready_queue->max_size;
 	queue->ready_queue->curr_size--;
 	queue->finished_queue->curr_size++;
 	queue->finished_queue->end = (queue->finished_queue->end + 1) % queue->finished_queue->max_size;
+	return ret;
 }
 
 
@@ -178,3 +183,19 @@ process_t* search_for_process(ready_blocked_queues_t* queues, unsigned long int 
 }
 
 
+void free_processes(ready_blocked_queues_t* queues) {
+	process_queue_t* finished = queues->finished_queue;
+	unsigned int i = finished->begin;
+	while(finished->process_array[i] != NULL) {
+		free_process(finished->process_array[i]);
+		i++;
+	}
+	free(queues->ready_queue->process_array);
+	free(queues->blocked_queue->process_array);
+	free(queues->finished_queue->process_array);
+	free(queues->ready_queue);
+	free(queues->blocked_queue);
+	free(queues->finished_queue);
+	free(queues);
+	
+}

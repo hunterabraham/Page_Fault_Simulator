@@ -107,7 +107,7 @@ process_t* search_for_process(ready_blocked_queues_t* queues, unsigned long int 
  * 
  * @param queues - the queues being manipulated
  */
-void move_to_finished(ready_blocked_queues_t* queues);
+unsigned long int move_to_finished(ready_blocked_queues_t* queues);
 
 
 /**
@@ -118,4 +118,12 @@ void move_to_finished(ready_blocked_queues_t* queues);
  */
 void add_to_ready(ready_blocked_queues_t* queues);
 
+
+/**
+ * Frees all process and their allocated memory
+ * 
+ * @param queues - the queues to remove
+ * 
+ */
+void free_processes(ready_blocked_queues_t* queues);
 #endif

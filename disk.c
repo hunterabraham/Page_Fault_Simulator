@@ -19,6 +19,10 @@ disk_t* create_disk(int size) {
 		exit(1);
 	}
 	new_disk->page_array = malloc(sizeof(page_t) * size);
+	if (NULL == new_disk->page_array) {
+		fprintf(stderr, "Error allocating new_disk->page_array in create_disk in disk.c\n");
+		exit(1);
+	}
 	new_disk->num_faults = 0;
 	new_disk->next_time_for_access = 0;
 	new_disk->curr_size = 0;
@@ -35,7 +39,7 @@ disk_t* create_disk(int size) {
  * @param page - the page being added to the disk
  */
 void add_page_to_disk(disk_t* disk, page_t* page, unsigned long int clock) {
-	if (disk->curr_size == 0) {
+	if (disk->curr_size == 0) { // if there is no page in disk, update I/O time
 		disk->next_time_for_access = clock + 2000000;
 	}
 	disk->page_array[disk->end] = page;
@@ -50,7 +54,7 @@ void add_page_to_disk(disk_t* disk, page_t* page, unsigned long int clock) {
  * @return     - the page that is removed (the first one in the queue)
  */
 page_t* remove_page_from_disk(disk_t* disk, unsigned long int clock) {
-	if (disk->curr_size != 0) {
+	if (disk->curr_size != 0) { // if there is a page available, update I/O times
 		disk->next_time_for_access = clock + 2000000;
 	}
 	page_t* page = disk->page_array[disk->begin];
@@ -72,4 +76,15 @@ unsigned long int is_ready(disk_t* disk, unsigned long int clock) {
 		return 1;
 	}
 	return 0;
+}
+
+
+void free_disk(disk_t* disk) {
+	unsigned int i = disk->begin;
+	while(disk->page_array[i] != NULL) {
+		free(disk->page_array[i]);
+		i = (i + 1) % disk->max_size;
+	}
+	free(disk->page_array);
+	free(disk);
 }

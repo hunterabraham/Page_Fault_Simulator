@@ -54,4 +54,12 @@ page_t* remove_page_from_disk(disk_t* disk, unsigned long int clock);
  */
 unsigned long int is_ready(disk_t* disk, unsigned long int clock);
 
+
+/**
+ * Frees the disk and all its allocated memory
+ * 
+ * @param disk - the disk to free
+ */
+void free_disk(disk_t* disk);
+
 #endif

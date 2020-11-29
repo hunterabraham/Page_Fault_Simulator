@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include "page_table.h"
 typedef struct fifo_queue_t {
-    page_t* pages;
+    page_t** pages;
     unsigned long int curr_size;
     unsigned long int begin;
     unsigned long int end;
@@ -36,5 +36,11 @@ page_t* pop_from_fifo_queue(fifo_queue_t* queue);
 void push_to_fifo_queue(fifo_queue_t* queue, page_t*);
 
 
+/**
+ * Frees a queue and its memory
+ * 
+ * @param queue - the queue to be freed 
+ */
+void free_queue(fifo_queue_t* queue);
 
 #endif

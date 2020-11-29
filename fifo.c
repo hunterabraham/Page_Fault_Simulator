@@ -31,7 +31,7 @@ fifo_queue_t* create_fifo_queue(int size) {
  * @return     - the index that is popped from the queue
  */
 page_t* pop_from_fifo_queue(fifo_queue_t* queue) {
-    page_t* ret = &queue->pages[queue->begin];
+    page_t* ret = queue->pages[queue->begin];
     queue->begin = (queue->begin + 1) % queue->max_size;
     queue->curr_size--;
     return ret;
@@ -44,10 +44,14 @@ page_t* pop_from_fifo_queue(fifo_queue_t* queue) {
  * @param index - the index being pushed
  */
 void push_to_fifo_queue(fifo_queue_t* queue, page_t* page) {
-    queue->pages[queue->end] = *page;
+    queue->pages[queue->end] = page;
     queue->end = (queue->end + 1) % queue->max_size;
     queue->curr_size++;
 }
 
 
 
+void free_queue(fifo_queue_t* queue)  {
+    free(queue->pages);
+    free(queue);
+}
