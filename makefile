@@ -1,6 +1,19 @@
-all: main_fifo.o input.o statistics.o cmd_line_processing.o process.o process_queue.o disk.o page_table.o fifo.o
-	gcc -o 537pfsim-fifo main_fifo.o input.o cmd_line_processing.o process.o statistics.o process_queue.o disk.o page_table.o fifo.o
-	echo all built successfully!
+all: fifo lru clock
+
+fifo: main_fifo.o input.o statistics.o cmd_line_processing.o process.o process_queue.o disk.o page_table.o fifo.o
+	gcc -ggdb -o 537pfsim-fifo main_fifo.o input.o cmd_line_processing.o process.o statistics.o process_queue.o disk.o page_table.o fifo.o
+
+lru: main_lru.o input.o statistics.o cmd_line_processing.o process.o process_queue.o disk.o page_table.o lru.o
+	gcc -ggdb -o 537pfsim-lru main_lru.o input.o cmd_line_processing.o process.o statistics.o process_queue.o disk.o page_table.o lru.o
+
+clock: main_clock.o input.o statistics.o cmd_line_processing.o process.o process_queue.o disk.o page_table.o clock.o
+	gcc -ggdb -o 537pfsim-clock main_clock.o input.o cmd_line_processing.o process.o statistics.o process_queue.o disk.o page_table.o clock.o
+
+clock.o: clock.c clock.h
+	gcc -Wextra -Wall -ggdb -c clock.c
+
+lru.o: lru.h lru.c
+	gcc -Wextra -Wall -ggdb -c lru.c
 
 process_queue.o: process_queue.h process_queue.c process.o
 	gcc -Wextra -Wall -ggdb -c process_queue.c
@@ -40,5 +53,5 @@ clean:
 test.o: test.c 
 	gcc -Wall -Wextra -ggdb -c test.c
 
-test: test.o input.o statistics.o cmd_line_processing.o process.o process_queue.o page_table.o disk.o fifo.o
-	gcc -o test_suite test.o input.o cmd_line_processing.o process.o statistics.o process_queue.o page_table.o disk.o fifo.o
+test: test.o input.o statistics.o cmd_line_processing.o process.o process_queue.o page_table.o disk.o fifo.o 
+	gcc -o test_suite test.o input.o cmd_line_processing.o process.o statistics.o process_queue.o page_table.o disk.o fifo.o 

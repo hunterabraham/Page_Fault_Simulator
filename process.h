@@ -18,7 +18,6 @@ typedef struct block_t {
 typedef struct process_t {
 	unsigned long int pid;
 	unsigned long int time_when_ready; // compared to clock to determine if blocked
-	unsigned long int first_ref; // line numbers in trace file, use to skip forward in file pointer, fseek()
 	unsigned long int last_ref;
 	page_table_t* page_table;
 	block_t* blocks; // sorted, will happen when we do first pass
@@ -43,7 +42,7 @@ unsigned long int is_waiting(process_t* process, unsigned long int clock);
  * @param pid - the pid of the process
  * @return    - a pointer to the new process struct
  */
-process_t* create_process(unsigned long int pid, unsigned long int page_table_size);
+process_t* create_process(unsigned long int pid);
 
 
 /**

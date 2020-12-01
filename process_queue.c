@@ -18,6 +18,8 @@ ready_blocked_queues_t* create_ready_blocked_queues(int size,  process_t** ready
 	ready->process_array = ready_queue;
 	process_t* temp_proc;
 	int i = 0;
+
+
 	while((temp_proc = ready_queue[i]) != NULL) {
 		i++;
 	}
@@ -25,16 +27,18 @@ ready_blocked_queues_t* create_ready_blocked_queues(int size,  process_t** ready
 	ready->max_size = size;
 	ready->begin = 0;
 	ready->end = i; // FIXME: might be wrong
+
 	process_queue_t* blocked = malloc(sizeof(process_queue_t));
 	if (NULL == blocked) {
 		fprintf(stderr, "Error allocating blocked queue in create_ready_blocked_queues() in process_queue.c\n");
 		exit(1);
 	}
-	blocked->process_array = malloc(sizeof(process_t) * size);
+	blocked->process_array = calloc(size, sizeof(process_t));
 	if (NULL == ready->process_array) {
 		fprintf(stderr, "Error allocating process_array in blocked queue in create_ready_blocked_queues() in process_queue.c\n");
 		exit(1);
 	}
+	
 	blocked->curr_size = 0;
 	blocked->max_size = size;
 	blocked->begin = 0;
@@ -52,8 +56,7 @@ ready_blocked_queues_t* create_ready_blocked_queues(int size,  process_t** ready
 	finished->curr_size = 0;
 	finished->max_size = size;
 	finished->begin = 0;
-	finished->end = 0;
-	
+	finished->end = 0;	
 	
 	ready_blocked_queues_t* rb_q = malloc(sizeof(ready_blocked_queues_t));
 	if (NULL == rb_q) {
@@ -90,10 +93,10 @@ process_t* get_next_process(ready_blocked_queues_t* queue) {
  * @param queues - the queues that are being manipulated
  */
 void add_to_ready(ready_blocked_queues_t* queues) {
+	
 	queues->ready_queue->process_array[queues->ready_queue->end] = queues->blocked_queue->process_array[queues->blocked_queue->begin];
 	queues->blocked_queue->begin = (queues->blocked_queue->begin + 1) % queues->blocked_queue->max_size;
 	queues->ready_queue->end = (queues->ready_queue->end + 1) % queues->ready_queue->max_size;
-	//queues->blocked_queue->begin = (queues->blocked_queue->begin + 1) % queues->blocked_queue->max_size;
 	queues->blocked_queue->curr_size--;
 	queues->ready_queue->curr_size++;
 }
@@ -115,12 +118,15 @@ void update_queues(ready_blocked_queues_t* queue, unsigned long int clock) {
 }
 
 unsigned long int remove_from_ready(ready_blocked_queues_t* queues) {
+	if (queues->ready_queue->curr_size == 0) {
+		return 0; 
+	}
 	unsigned long int ret = queues->ready_queue->process_array[queues->ready_queue->begin]->num_pages;
 	free_ptable(queues->ready_queue->process_array[queues->ready_queue->begin]->page_table);
 	free(queues->ready_queue->process_array[queues->ready_queue->begin]->blocks);
 	free(queues->ready_queue->process_array[queues->ready_queue->begin]);
 	queues->ready_queue->begin = (queues->ready_queue->begin + 1) % queues->ready_queue->max_size;
-	queues->ready_queue->curr_size--;
+	queues->ready_queue->curr_size -= 1;
 	return ret;
 }
 
@@ -131,11 +137,15 @@ unsigned long int remove_from_ready(ready_blocked_queues_t* queues) {
  * @param process - the process to move from ready to blocked
  */
 void move_to_blocked(ready_blocked_queues_t* queue) {
+	if (queue->ready_queue->curr_size == 0) {
+		return;
+	}
 	queue->blocked_queue->process_array[queue->blocked_queue->end] = queue->ready_queue->process_array[queue->ready_queue->begin];
 	queue->ready_queue->begin = (queue->ready_queue->begin + 1) % queue->ready_queue->max_size;
 	queue->ready_queue->curr_size--;
 	queue->blocked_queue->curr_size++;
 	queue->blocked_queue->end = (queue->blocked_queue->end + 1) % queue->blocked_queue->max_size;
+	
 }
 
 unsigned long int move_to_finished(ready_blocked_queues_t* queue) {
@@ -150,6 +160,9 @@ unsigned long int move_to_finished(ready_blocked_queues_t* queue) {
 
 
 process_t* peek_ready(ready_blocked_queues_t* queues) {
+	if (queues->ready_queue->curr_size == 0) {
+		return NULL;
+	}
 	return queues->ready_queue->process_array[queues->ready_queue->begin];
 }
 
@@ -170,7 +183,7 @@ process_t* search_for_process(ready_blocked_queues_t* queues, unsigned long int 
 		}
 		i++;
 	}
-
+	/*
 	process_queue_t* finished = queues->finished_queue;
 	i = finished->begin;
 	while(finished->process_array[i] != NULL) {
@@ -179,6 +192,7 @@ process_t* search_for_process(ready_blocked_queues_t* queues, unsigned long int 
 		}
 		i++;
 	}
+	*/
 	return NULL;
 }
 

@@ -50,7 +50,7 @@ unsigned long int* split(char* buffer) {
 }
 
 
-process_t** find_all_processes(char* fpath, unsigned long int page_table_size, unsigned long int* num_mem_refs) {
+process_t** find_all_processes(char* fpath, unsigned long int* num_mem_refs) {
 	const unsigned long int BUFSIZE = 10000;
 	// holds all processes
 	process_t** process_list = malloc(sizeof(process_t) * BUFSIZE);
@@ -77,8 +77,8 @@ process_t** find_all_processes(char* fpath, unsigned long int page_table_size, u
 		unsigned long int pid = ret_arr[1];
 		long int idx = contains(process_list, pid); // see if process is in list
 		if (idx == -1) { // if it isn't, make a new one and add it to the list
-			process_t* new_proc = create_process(pid, page_table_size);
-			new_proc->first_ref = curr_row; // mark the first reference
+			process_t* new_proc = create_process(pid);
+			//new_proc->first_ref = curr_row; // mark the first reference
 			new_proc->last_ref = curr_row;
 			new_proc->blocks[new_proc->num_blocks].start = curr_num_bytes;
 			new_proc->blocks[new_proc->num_blocks].end = curr_num_bytes;
@@ -148,7 +148,6 @@ page_t* read_next(process_t* process) {
 		}
 		new_page->pid = this_pid;
 		new_page->vpn = vpn;
-		new_page->page_table_idx = -1;
 		new_page->num_bytes = num_bytes;
 		free(res_array);
 		return new_page;

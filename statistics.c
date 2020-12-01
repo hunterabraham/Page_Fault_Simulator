@@ -21,8 +21,8 @@ stats_t* init_stats() {
 }
 
 void print_stats(stats_t* stats, unsigned long int clock) {
-	printf("Average Memory Utilization (AMU): %f\n", stats->average_memory_utilization);
-	printf("Average Runnable Processes (ARP): %f\n", stats->average_runnable_processes);
+	printf("Average Memory Utilization (AMU): %Lf\n", stats->average_memory_utilization);
+	printf("Average Runnable Processes (ARP): %Lf\n", stats->average_runnable_processes);
 	printf("Total Memory References (TMR):    %ld\n", stats->total_memory_references);
 	printf("Total Page Faults (TPF):          %ld\n", stats->total_page_faults);
 	printf("Total Running Time:               %ld\n", clock);

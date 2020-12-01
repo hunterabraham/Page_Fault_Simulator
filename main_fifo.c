@@ -20,40 +20,38 @@ int main(int argc, char** argv) {
 	if (num_mem_refs == NULL) {
 		fprintf(stderr, "Error allocating num_mem_refs in main_fifo.c\n");
 	}
-	process_t** list_of_procs = find_all_processes(fpath, num_page_tables, num_mem_refs);
+	process_t** list_of_procs = find_all_processes(fpath, num_mem_refs);
 	// build ready and blocked queues for the processes
 	ready_blocked_queues_t* queues = create_ready_blocked_queues(BUFSIZE, list_of_procs);
 	// initialize disk & statistics
-	disk_t* disk = create_disk(BUFSIZE);
+	disk_t* disk = create_disk(BUFSIZE); // FIXME
 	stats_t* stats = init_stats();
 	unsigned long int clock = 0;
 	unsigned long int num_finished_procs = 0;
-	unsigned long int num_pages = 0;
+	long int num_pages = 0;
+	unsigned long int num_procs_total = queues->ready_queue->curr_size;
 	
-	fifo_queue_t* fifo_queue = create_fifo_queue(1000000);
+	queue_t* queue = create_queue(num_page_tables);
 	// MAIN LOOP
-	while(*num_mem_refs > stats->total_memory_references) { 
+	//while(*num_mem_refs > stats->total_memory_references) { 
+	while(num_finished_procs < num_procs_total) {
 		process_t* curr_proc = peek_ready(queues);
 		if (curr_proc != NULL) {
 			page_t* new_page = read_next(curr_proc); 
 			if (new_page == NULL) {
+				remove_all_pages(queue, curr_proc->pid);
 				free(new_page); 
 				num_finished_procs++;
-				unsigned long int num_pages_proc = move_to_finished(queues);
-				num_pages -= num_pages_proc;
+				move_to_finished(queues);
+				num_pages -= curr_proc->num_pages;
 				continue;
 			}
-			if (is_in_ptable(curr_proc->page_table, new_page)) {
+			if (is_in_ptable(curr_proc->page_table, new_page)) { // page is in table, free memory and increment memory references
 				stats->total_memory_references += 1;
 				free(new_page);
-				if (*num_mem_refs == stats->total_memory_references) {
-					num_pages -= move_to_finished(queues);
-				}
-				num_finished_procs++;
 			} else { // page is not in table
-				// have to move process' pointer back one
 				fseek(curr_proc->fptr, -1 * ((int)new_page->num_bytes), SEEK_CUR);
-				stats->total_page_faults += 1;
+				stats->total_page_faults++;
 				add_page_to_disk(disk, new_page, clock);
 				move_to_blocked(queues);
 			}
@@ -61,30 +59,40 @@ int main(int argc, char** argv) {
 		if (is_ready(disk, clock)) {
 			page_t* page_to_add = remove_page_from_disk(disk, clock);
 			if (page_to_add != NULL) {
-				if (num_pages >= num_page_tables) { // if page table is full, evict page
-					page_t* page_to_remove = pop_from_fifo_queue(fifo_queue);
-					process_t* process_of_page = search_for_process(queues, page_to_remove->pid); // BOTTLENECK
-					remove_from_ptable(process_of_page->page_table, page_to_remove);
-					num_pages--;
+				page_t* page_to_remove = replacement_algorithm(queue, page_to_add);
+				if (page_to_remove != NULL) {
+					process_t* process_of_page = search_for_process(queues, page_to_remove->pid);
+					if (process_of_page == NULL) { // page has already been removed
+					} else {
+						remove_from_ptable(process_of_page->page_table, page_to_remove);
+						process_of_page->num_pages -= 1;
+						num_pages--;
+					}
 				}
-				process_t* process_of_add_page = search_for_process(queues, page_to_add->pid); // BOTTLENECK
-				add_to_ptable(process_of_add_page->page_table, page_to_add);
+				process_t* process_of_add_page = search_for_process(queues, page_to_add->pid); 
+				process_of_add_page->num_pages = add_to_ptable(process_of_add_page->page_table, page_to_add);
 				add_to_ready(queues);
-				push_to_fifo_queue(fifo_queue, page_to_add);
-				process_of_add_page->num_pages++;
 				num_pages++;
 			}
 		}
-		stats->sum_page_frames += ((double)num_pages) / ((double)num_page_tables);
+		stats->sum_page_frames += ((long double)queue->curr_size) / ((long double)num_page_tables);
 		stats->sum_runnable_processes += queues->ready_queue->curr_size;
-		clock++;
+		if (queues->ready_queue->curr_size == 0) {
+			stats->sum_page_frames += (((long double)(disk->next_time_for_access - clock)) * ((long double)queue->curr_size)) / ((long double) num_page_tables);
+			clock = disk->next_time_for_access;
+		} else {
+			clock++;
+		}
+		
+		
+
 	}
-	stats->average_memory_utilization = ((double)(((double)stats->sum_page_frames) / ((double)clock)));
-	stats->average_runnable_processes = ((double)(((double)stats->sum_runnable_processes) / ((double)clock)));
+	stats->average_memory_utilization = ((long double)(((long double)stats->sum_page_frames) / ((long double)clock)));
+	stats->average_runnable_processes = ((long double)(((long double)stats->sum_runnable_processes) / ((long double)clock)));
 	print_stats(stats, clock);
 	free_processes(queues);
 	free_disk(disk);
-	free_queue(fifo_queue);
+	free_queue(queue);
 	free(stats);
 	free(args);
 	free(num_mem_refs);

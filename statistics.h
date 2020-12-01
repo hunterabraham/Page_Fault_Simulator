@@ -2,10 +2,10 @@
 #define STATS_H
 
 typedef struct stats_t {
-	double sum_page_frames;
-	double average_memory_utilization;
+	long double sum_page_frames;
+	long double average_memory_utilization;
 	unsigned long int sum_runnable_processes;
-	double average_runnable_processes;
+	long double average_runnable_processes;
 	unsigned long int total_memory_references;
 	unsigned long int total_page_faults;
 } stats_t;

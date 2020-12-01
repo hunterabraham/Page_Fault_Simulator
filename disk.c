@@ -81,10 +81,12 @@ unsigned long int is_ready(disk_t* disk, unsigned long int clock) {
 
 void free_disk(disk_t* disk) {
 	unsigned int i = disk->begin;
+	/* FIXME should be able to free
 	while(disk->page_array[i] != NULL) {
 		free(disk->page_array[i]);
 		i = (i + 1) % disk->max_size;
 	}
+	*/
 	free(disk->page_array);
 	free(disk);
 }

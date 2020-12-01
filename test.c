@@ -8,6 +8,9 @@
 #include "disk.h"
 #include "process_queue.h"
 #include "fifo.h"
+//#include "lru.h"
+
+
 void test_moving_queues(ready_blocked_queues_t* queues) {
     process_queue_t* ready = queues->ready_queue;
     process_queue_t* blocked = queues->blocked_queue;
@@ -288,13 +291,151 @@ void test_fifo_queue() {
     fprintf(stderr, "%ld\n", ret->vpn);
 }
 
+
+// void test_lru_queue() {
+//     lru_queue_t* lru_queue = create_lru_queue(1000);
+    
+
+//     for (int i = 0; i < 183; i++) {
+//         page_t* new_page = malloc(sizeof(page_t));
+//         new_page->vpn = 1000 + i;
+//         new_page->pid = 1000;
+//         push_to_lru_queue(lru_queue, new_page);
+//     }
+//     page_t* ret = pop_from_lru_queue(lru_queue);
+//     fprintf(stderr, "%ld\n", ret->vpn);
+//     for (int i = 0; i < 50; i++) {
+//         pop_from_lru_queue(lru_queue);
+//     }
+//     ret = pop_from_lru_queue(lru_queue);
+//     fprintf(stderr, "%ld\n", ret->vpn);
+
+//     page_t* ex_page = malloc(sizeof(page_t));
+//     ex_page->vpn = 1052;
+//     ex_page->pid = 1000;
+//     update_mem_reference(lru_queue, ex_page);
+
+//     page_t* ret_page;
+//     for (int i = 0; i < 100; i++) {
+//         ret_page = lru_queue->back->page;
+//         fprintf(stderr, "%ld\n", ret_page->vpn);
+//         update_mem_reference(lru_queue, ret_page);
+//     }
+
+// }
+
+// void test_lru_remove_all() {
+//     lru_queue_t* lru_queue = create_lru_queue(1000);
+    
+//     process_t* proc = create_process(1000);
+
+//     for (int i = 0; i < 183; i++) {
+//         page_t* new_page = malloc(sizeof(page_t));
+//         new_page->vpn = 1000 + i;
+//         new_page->pid = 1000;
+//         push_to_lru_queue(lru_queue, new_page);
+//         add_to_ptable(proc->page_table, new_page);
+//     }
+//     for (int i = 0; i < 4; i++) {
+//         page_t* new_page = malloc(sizeof(page_t));
+//         new_page->vpn = 1000 + i;
+//         new_page->pid = 1001;
+//         add_to_ptable(proc->page_table, new_page);
+//     }
+//     remove_all_pages(lru_queue, proc);
+    
+//     page_t* ret = pop_from_lru_queue(lru_queue);
+//     fprintf(stderr, "%ld\n", ret->vpn);
+//     // for (int i = 0; i < 50; i++) {
+//     //     pop_from_lru_queue(lru_queue);
+//     // }
+//     ret = pop_from_lru_queue(lru_queue);
+//     fprintf(stderr, "%ld\n", ret->vpn);
+//     ret = pop_from_lru_queue(lru_queue);
+//     fprintf(stderr, "%ld\n", ret->vpn);
+//     ret = pop_from_lru_queue(lru_queue);
+//     fprintf(stderr, "%ld\n", ret->vpn);
+//     // page_t* ex_page = malloc(sizeof(page_t));
+//     // ex_page->vpn = 1052;
+//     // ex_page->pid = 1000;
+//     // update_mem_reference(lru_queue, ex_page);
+
+//     // page_t* ret_page;
+//     // for (int i = 0; i < 100; i++) {
+//     //     ret_page = lru_queue->back->page;
+//     //     fprintf(stderr, "%ld\n", ret_page->vpn);
+//     //     update_mem_reference(lru_queue, ret_page);
+//     // }
+
+// }
+
+void test_fifo_remove_all() {
+    fifo_queue_t* fifo_queue = create_fifo_queue(1000);
+    
+    process_t* proc = create_process(1000);
+
+    for (int i = 0; i < 183; i++) {
+        page_t* new_page = malloc(sizeof(page_t));
+        new_page->vpn = 1000 + i;
+        new_page->pid = 1000;
+        push_to_fifo_queue(fifo_queue, new_page);
+        add_to_ptable(proc->page_table, new_page);
+    }
+    for (int i = 0; i < 4; i++) {
+        page_t* new_page = malloc(sizeof(page_t));
+        new_page->vpn = 2000 + i;
+        new_page->pid = 1001;
+        add_to_ptable(proc->page_table, new_page);
+    }
+    remove_all_pages(fifo_queue, proc->pid);
+    
+    page_t* ret = pop_from_fifo_queue(fifo_queue);
+    fprintf(stderr, "%ld\n", ret->vpn);
+    // for (int i = 0; i < 50; i++) {
+    //     pop_from_lru_queue(lru_queue);
+    // }
+    ret = pop_from_fifo_queue(fifo_queue);
+    fprintf(stderr, "%ld\n", ret->vpn);
+    ret = pop_from_fifo_queue(fifo_queue);
+    fprintf(stderr, "%ld\n", ret->vpn);
+    ret = pop_from_fifo_queue(fifo_queue);
+    fprintf(stderr, "%ld\n", ret->vpn);
+}
+
+void test_fifo_replacement() {
+    fifo_queue_t* fifo_queue = create_fifo_queue(1000);
+    fprintf(stderr, "Testing fifo replacement...\n");
+    for (int i = 0; i < 1000; i++) {
+        page_t* new_page = malloc(sizeof(page_t));
+        new_page->vpn = 1000 + i;
+        new_page->pid = 1000;
+        page_t* ret_1 = replacement_algorithm(fifo_queue, new_page);
+        if (ret_1 != NULL) {
+            fprintf(stderr, "Failure adding element %d\n", i);
+        }
+    }
+    for (int i = 0; i < 1000; i++) {
+        page_t* new_page = malloc(sizeof(page_t));
+        new_page->vpn = 1000 + i;
+        new_page->pid = 1000;
+        page_t* ret_1 = replacement_algorithm(fifo_queue, new_page);
+        if (fifo_queue->curr_size != 256) {
+            fprintf(stderr, "Failure")
+        }
+        if (ret_1 == NULL) {
+            fprintf(stderr, "Failure adding element %d\n", i);
+        }
+    }
+    
+}
+
 int main(int argc, char** argv) {
 	const unsigned long int BUFSIZE = 4096;
 	cmd_args* args = process_args(argc, argv);
 	unsigned long int page_table_size = args->real_mem_size / args->page_size;
 	char* fpath = args->file_name;
     unsigned long int* num = malloc(sizeof(int));
-	process_t** list_of_procs = find_all_processes(fpath, BUFSIZE, num);
+	process_t** list_of_procs = find_all_processes(fpath, num);
 	ready_blocked_queues_t* queues = create_ready_blocked_queues(BUFSIZE, list_of_procs);
 	//test_moving_queues(queues); // RUN WITH test/4000.addrtrace
     //test_peek_ready(queues);
@@ -304,5 +445,9 @@ int main(int argc, char** argv) {
     //test_find_all_processes(queues);
     //test_ptable_2();
     //test_ptable_tree();
-    test_fifo_queue();
+    //test_fifo_queue();
+    //test_lru_queue();
+    //test_lru_remove_all();
+    //test_fifo_remove_all();
+    test_fifo_replacement();
 }

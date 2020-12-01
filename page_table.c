@@ -1,8 +1,10 @@
 
+
+#define _GNU_SOURCE
 #include <stdlib.h>
 #include <stdio.h>
+#include <search.h>
 #include "page_table.h"
-
 
 /**
  * Allocate memory for all structs, initialize curr_size to 0 and max_size to size param
@@ -10,29 +12,32 @@
  * @param size - the size of the page table
  * @return     - a pointer to the new page table
  */ 
-page_table_t* create_page_table(unsigned long int size) {
+page_table_t* create_page_table() {
     page_table_t* page_table = malloc(sizeof(page_table_t)); 
     if (NULL == page_table) {
         fprintf(stderr, "Error allocating page_table in create_page_table() in page_table.c\n");
         exit(1);
     }
     page_table->curr_size = 0;
-    page_table->max_size = size;
+    //page_table->max_size = size;
 
     page_table->root = NULL;
     return page_table;
 }
 
 int compare_pages(const void* page1, const void* page2) {
-    //fprintf(stderr, "%ld\n", ((const page_t*)page1)->vpn);
-    //fprintf(stderr, "%ld\n\n\n", ((const page_t*)page2)->vpn);
-    if (((const page_t*)page1)->vpn < ((const page_t*)page2)->vpn) {
+    page_t* page1_ptype = (page_t *)page1;
+    page_t* page2_ptype = (page_t *)page2;
+    if (page1_ptype->vpn < page2_ptype->vpn) {
         return -1;
     }
-    else if (((const page_t*)page1)->vpn > ((const page_t*)page2)->vpn) {
+    else if (page1_ptype->vpn > page2_ptype->vpn) {
         return 1;
     }
-    return 0;
+    else {
+        return 0;
+    }
+    
 }
 
 /**
@@ -42,17 +47,50 @@ int compare_pages(const void* page1, const void* page2) {
  * @param page   - the page being added
  */ 
 unsigned long int add_to_ptable(page_table_t* ptable, page_t* page) {
-    void* ret;
-    page_t* page_ret; 
-    ret = tsearch((void *)page, (void **)&ptable->root, compare_pages);
-    page_ret = (page_t*) ret;
-    if (ret != page_ret) {
-        free(page);
+    void *result;
+    struct page_t *existing;
+    void** root = &(ptable->root);
+    if ((result = tsearch(page, root, compare_pages)) == NULL) {
+        // Failed to add the node
+        // exit_with_message("Insufficient memory");
+        fprintf(stderr, "Adding to table failed\n");
+        exit(EXIT_FAILURE);
+    } else {
+        // Check if an node with the same key already existed
+        existing = *((struct page_t**)result);
+
+        if (existing != page) {
+            //printf("Node with key already exists. ");
+            //printf("key: %ld, pid: %ld\n", page->vpn, page->pid);
+            free(page);
+        } else {
+            ptable->curr_size++;
+
+            //printf("Added node. %ld\n", page->vpn);
+        }
     }
-    ptable->curr_size++;
-    return 0;
+
+    return ptable->curr_size;
 }
 
+page_t* find_page(void** root, page_t* page) {
+    void *result;
+    page_t *found_page;
+    
+
+
+    if ((result = tfind(page, root, compare_pages)) == NULL) {
+        // No node found
+        //printf("No node found. key: %ld\n", page->vpn);
+        found_page = NULL;
+    } else {
+        // Node found
+        found_page = *(struct page_t**)result;
+        //printf("Found node. key: %ld\n", page->vpn);
+    }
+
+    return found_page;
+}
 
 
 
@@ -63,21 +101,26 @@ unsigned long int add_to_ptable(page_table_t* ptable, page_t* page) {
  * @param ptable - the page table being remove from 
  * @return       - the page if found, otherwise NULL
  */
-void remove_from_ptable(page_table_t* ptable, page_t* page) {
-    tdelete(page, (void**)&ptable->root, compare_pages);
+void remove_from_ptable(page_table_t* ptable, page_t* page) {//unsigned long int vpn) {//
+    page_t *page_temp;
+    void** root = &(ptable->root);
+    if ((page_temp = find_page(root, page)) == NULL) {
+    } else {
+        tdelete((void*)page_temp, root, compare_pages); //FIXME
+        //printf("Deleted node. key: %d, value: %d\n", node->key, node->value);
+        // It's important to free the only after deleting it
+        free(page_temp);
+    }
     ptable->curr_size--;
-    free(page);
 }
 
 
-unsigned long int is_in_ptable(page_table_t* table, page_t* page) {
-    void* found_page;
-    found_page = tfind((void*)page, (void**)&table->root, compare_pages);
-    page_t* found_page_page = (page_t*) found_page;
-    if (found_page_page != NULL) {
-        return 1;
+unsigned long int is_in_ptable(page_table_t* table, page_t* page) { // FIXME
+    page_t* found_page = find_page(&table->root, page);
+    if (found_page == NULL) {
+        return 0;
     }
-    return 0;
+    return 1;
 }
 
 /**
