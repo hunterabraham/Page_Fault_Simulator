@@ -7,39 +7,40 @@
 1. Get command line arguments (page size, real memory size, and trace file name)
 2. Do first pass of the trace file, creating the process list with maps to its blocks in the trace file
 3. Build ready and blocked queues for the processes. Put all processes in the ready queue
-4. Initialize disk, inverted page table (??), and statistics
+4. Initialize disk, data structure, and statistics
 5. Start main loop
 6. If no current process exists, pop a process from ready queue
 7. Get next memory reference for that process
+	- If process is done, free memory
 8. If page is in table
 	- continue
 9. If page is not in table
 	- Add page to disk queue
 	- Move process to blocked queue
-	- Set current process pointer to NULL (Cause memory reference error?)
 10. Check if disk is ready
 	- if it is, pop page from disk queue
 		- if page table is full, use algorithm to determine which page to remove
 		- Remove page
 		- Add new page to page table
 11. Increment clock
+	- if no processes are ready, "fast forward" to when disk is ready
 12. Update ready and blocked queues
 
 ## Modules
 
 - **cmd_line_processing.h:**
 	- *Summary:* Parses command line arguments to construct page table
-	- *Status:* Completed
+	- *Status:* DONE
 	- *Files:* cmd_line_processing.h, cmd_line_processing.c
 	- *Methods:*
 		- `cmd_args process_args(int argc, char** argv)`
-			- *Status:* Done
+			- *Status:* DONE, TESTED
 			- *Functionality:* Processes command line arguments to get file name, mem size, and page size
 	
 
 - **input.h**
 	- *Summary:* Parses input file to construct process queue and get next memory reference
-	- *Status:* INP
+	- *Status:* DONE
 	- *Files:* input.c, input.h
 	- *Methods:*
 		- `process_t** find_all_processes(char* fpath)`
@@ -143,7 +144,7 @@
 			- *Status:* DONE, TESTED
 			- *Functionality:* Runs the page replacement algo of the executable (E.g. FIFO, LRU, Clock)
 		- `void update_mem_reference(queue_t* queue, page_t* page)`
-			- *Status:* DONE, TESTED
+			- *Status:* INP - clock not working correctly
 			- *Functionality:* Updates the memory reference for the page if necessary
 
 
