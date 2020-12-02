@@ -121,34 +121,30 @@
 		- `void add_to_ready(ready_blocked_queues_t* queues)`
 			- *Status:* DONE, TESTED
 			- *Functionality:* Moves a process to the ready queue
-			unsigned long int move_to_finished(ready_blocked_queues_t* queues);
 		- `void free_processes(ready_blocked_queues_t* queues)`
 			- *Status:* DONE, TESTED
 			- *Functionality:* Frees the processes and all of its members, including blocks and page tables
 
-
-
-## Algorithm Modules
-
-### FIFO
-
-- *Summary:* A FIFO queue to handle FIFO page replacement
-- *Status:* DONE, TESTED
-- *Files:* fifo.c, fifo.h
-- *Methods:*
-	- `fifo_queue_t* create_fifo_queue(int size)`
-		- *Status:* DONE, TESTED
-		- *Functionality:* Creates fifo queue and allocates memory
-	- `page_t* pop_from_fifo_queue(fifo_queue_t* queue)`
-		- *Status:* DONE, TESTED
-		- *Functionality:* Pops the first element from the fifo queue
-	- `void push_to_fifo_queue(fifo_queue_t* queue, page_t*)`
-		- *Status:* DONE, TESTED
-		- *Functionality:* Pushes the specified page to the end of the queue
-	- `void free_queue(fifo_queue_t* queue)`
-		- *Status:* DONE, TESTED
-		- *Functionality:* Frees the queue's memory
-
+- **page_replacement_interface.h**
+	- *Summary:* Interface for page replacement algorithms
+	- *Status:* DONE, TESTED
+	- *Files:* page_replacement_interface.h, fifo.c, lru.c, clock.c
+	- *Methods:*
+		- `queue_t* create_queue(int size)`
+			- *Status:* DONE, TESTED
+			- *Functionality:* Creates the data structure for the algorithm and allocates structures & memory
+		- `void free_queue(queue_t* queue)`
+			- *Status:* DONE, TESTED
+			- *Functionality:* Frees the data structure & its memory
+		- `unsigned long int remove_all_pages(queue_t* queue, unsigned long int pid)`
+			- *Status:* DONE, TESTED
+			- *Functionality:* Frees the memory of the process with the specified pid
+		- `page_t* replacement_algorithm(queue_t* queue, page_t* page)`
+			- *Status:* DONE, TESTED
+			- *Functionality:* Runs the page replacement algo of the executable (E.g. FIFO, LRU, Clock)
+		- `void update_mem_reference(queue_t* queue, page_t* page)`
+			- *Status:* DONE, TESTED
+			- *Functionality:* Updates the memory reference for the page if necessary
 
 
  

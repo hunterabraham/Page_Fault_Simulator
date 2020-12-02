@@ -4,7 +4,7 @@
 #include <search.h>
 #include <string.h>
 #include "page_table.h"
-#include "clock.h"
+#include "page_replacement_interface.h"
 #include "process.h"
 
 queue_node_t* create_node(page_t* page) {
@@ -17,7 +17,6 @@ queue_node_t* create_node(page_t* page) {
     new_node->next = NULL;
     new_node->page = page;
     new_node->ready = 1;
-    new_node->is_here = 1;
     return new_node;
 }
 

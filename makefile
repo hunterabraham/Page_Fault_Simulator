@@ -1,34 +1,31 @@
-all: fifo lru clock
+all: 537pfsim-fifo 537pfsim-lru 537pfsim-clock
 
-fifo: main_fifo.o input.o statistics.o cmd_line_processing.o process.o process_queue.o disk.o page_table.o fifo.o
-	gcc -ggdb -o 537pfsim-fifo main_fifo.o input.o cmd_line_processing.o process.o statistics.o process_queue.o disk.o page_table.o fifo.o
+537pfsim-fifo: main.o fifo.o process_queue.o process.o input.o statistics.o cmd_line_processing.o page_table.o disk.o
+	gcc -o 537pfsim-fifo main.o fifo.o process_queue.o process.o input.o statistics.o cmd_line_processing.o page_table.o disk.o
 
-lru: main_lru.o input.o statistics.o cmd_line_processing.o process.o process_queue.o disk.o page_table.o lru.o
-	gcc -ggdb -o 537pfsim-lru main_lru.o input.o cmd_line_processing.o process.o statistics.o process_queue.o disk.o page_table.o lru.o
+537pfsim-lru: main.o lru.o process_queue.o process.o input.o statistics.o cmd_line_processing.o page_table.o disk.o
+	gcc -o 537pfsim-lru main.o lru.o process_queue.o process.o input.o statistics.o cmd_line_processing.o page_table.o disk.o
 
-clock: main_clock.o input.o statistics.o cmd_line_processing.o process.o process_queue.o disk.o page_table.o clock.o
-	gcc -ggdb -o 537pfsim-clock main_clock.o input.o cmd_line_processing.o process.o statistics.o process_queue.o disk.o page_table.o clock.o
+537pfsim-clock: main.o clock.o process_queue.o process.o input.o statistics.o cmd_line_processing.o page_table.o disk.o
+	gcc -o 537pfsim-clock main.o clock.o process_queue.o process.o input.o statistics.o cmd_line_processing.o page_table.o disk.o
 
-clock.o: clock.c clock.h
-	gcc -Wextra -Wall -ggdb -c clock.c
+clock.o: clock.c page_replacement_interface.h
+	gcc -c clock.c
 
-lru.o: lru.h lru.c
-	gcc -Wextra -Wall -ggdb -c lru.c
+fifo.o: fifo.c page_replacement_interface.h
+	gcc -c fifo.c
+
+lru.o: lru.c page_replacement_interface.h
+	gcc -c lru.c
+
+main.o: main.c page_replacement_interface.h
+	gcc -c main.c
 
 process_queue.o: process_queue.h process_queue.c process.o
 	gcc -Wextra -Wall -ggdb -c process_queue.c
 
-#inverted_page_table.o: inverted_page_table.c inverted_page_table.h
-#	gcc -Wextra -Wall -ggdb -c inverted_page_table.c
-
-fifo.o: fifo.c fifo.h
-	gcc -Wall -Wextra -ggdb -c fifo.c
-
 input.o: input.c input.h
 	gcc -Wall -Wextra -ggdb -c input.c
-
-main_fifo.o: main_fifo.c input.c input.h cmd_line_processing.c cmd_line_processing.h
-	gcc -Wall -Wextra -ggdb -c main_fifo.c
 
 statistics.o: statistics.c statistics.h
 	gcc -Wall -Wextra -ggdb -c statistics.c
@@ -50,8 +47,3 @@ clean:
 	-rm 537pfsim-fifo
 	-rm *.o
 
-test.o: test.c 
-	gcc -Wall -Wextra -ggdb -c test.c
-
-test: test.o input.o statistics.o cmd_line_processing.o process.o process_queue.o page_table.o disk.o fifo.o 
-	gcc -o test_suite test.o input.o cmd_line_processing.o process.o statistics.o process_queue.o page_table.o disk.o fifo.o 

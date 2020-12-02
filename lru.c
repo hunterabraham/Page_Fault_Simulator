@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <search.h>
 #include <string.h>
-#include "lru.h"
+#include "page_replacement_interface.h"
 #include "process.h"
 
 

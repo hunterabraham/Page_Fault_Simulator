@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include "fifo.h"
+#include "page_replacement_interface.h"
 
 /**
  * Creates an LRU node with the specified page
@@ -140,3 +140,7 @@ unsigned long int remove_all_pages(queue_t* queue, unsigned long int pid) {
     return count;
 }
 
+
+void update_mem_reference(queue_t* queue, page_t* page) {
+    
+}
