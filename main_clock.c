@@ -7,7 +7,7 @@
 #include "page_table.h"
 #include "disk.h"
 #include "process_queue.h"
-#include "fifo.h"
+#include "clock.h"
 
 int main(int argc, char** argv) {
 	const unsigned long int BUFSIZE = 4096;
@@ -30,17 +30,14 @@ int main(int argc, char** argv) {
 	unsigned long int num_finished_procs = 0;
 	long int num_pages = 0;
 	unsigned long int num_procs_total = queues->ready_queue->curr_size;
-	
 	queue_t* queue = create_queue(num_page_tables);
 	// MAIN LOOP
-	//while(*num_mem_refs > stats->total_memory_references) { 
 	while(num_finished_procs < num_procs_total) {
 		process_t* curr_proc = peek_ready(queues);
 		if (curr_proc != NULL) {
 			page_t* new_page = read_next(curr_proc); 
 			if (new_page == NULL) {
 				unsigned long int ret = remove_all_pages(queue, curr_proc->pid);
-				//fprintf(stderr, "%ld, %ld\n", curr_proc->num_pages, ret);
 				free(new_page); 
 				num_finished_procs++;
 				move_to_finished(queues);

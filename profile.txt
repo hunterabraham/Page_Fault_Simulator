@@ -2,27 +2,42 @@ Flat profile:
 
 Each sample counts as 0.01 seconds.
   %   cumulative   self              self     total           
- time   seconds   seconds    calls  us/call  us/call  name    
- 60.97     76.27    76.27                             main
- 20.93    102.45    26.18 2504693189     0.01     0.01  peek_ready
- 12.90    118.59    16.14 2504693182     0.01     0.01  is_ready
-  4.45    124.15     5.56     9842   565.07   565.07  remove_page_from_disk
-  0.28    124.50     0.35                             split
-  0.19    124.74     0.24                             compare_pages
-  0.15    124.93     0.19                             read_next
-  0.15    125.12     0.19                             find_all_processes
-  0.09    125.23     0.11                             contains
-  0.01    125.24     0.01                             is_in_ptable
-  0.00    125.24     0.01                             create_page_table
-  0.00    125.24     0.00    19428     0.00     0.00  search_for_process
-  0.00    125.24     0.00     9842     0.00     0.00  add_page_to_disk
-  0.00    125.24     0.00     9842     0.00     0.00  add_to_ready
-  0.00    125.24     0.00     9842     0.00     0.00  move_to_blocked
-  0.00    125.24     0.00        7     0.00     0.00  move_to_finished
-  0.00    125.24     0.00        1     0.00     0.00  create_disk
-  0.00    125.24     0.00        1     0.00     0.00  create_ready_blocked_queues
-  0.00    125.24     0.00        1     0.00     0.00  free_disk
-  0.00    125.24     0.00        1     0.00     0.00  free_processes
+ time   seconds   seconds    calls  ms/call  ms/call  name    
+ 22.50      0.20     0.20 24033604     0.00     0.00  split
+ 20.25      0.38     0.18 12009567     0.00     0.00  read_next
+ 15.75      0.52     0.14                             main
+ 13.50      0.64     0.12                             compare_pages
+  9.00      0.72     0.08 12000000     0.00     0.00  contains
+  6.75      0.78     0.06        1    60.07   240.13  find_all_processes
+  3.37      0.81     0.03 12019133     0.00     0.00  peek_ready
+  3.37      0.84     0.03 12018456     0.00     0.00  find_page
+  3.37      0.87     0.03 12009559     0.00     0.00  is_in_ptable
+  2.25      0.89     0.02 12019125     0.00     0.00  is_ready
+  0.00      0.89     0.00    18456     0.00     0.00  search_for_process
+  0.00      0.89     0.00     9559     0.00     0.00  add_page_to_disk
+  0.00      0.89     0.00     9559     0.00     0.00  add_to_ptable
+  0.00      0.89     0.00     9559     0.00     0.00  add_to_ready
+  0.00      0.89     0.00     9559     0.00     0.00  create_node
+  0.00      0.89     0.00     9559     0.00     0.00  move_to_blocked
+  0.00      0.89     0.00     9559     0.00     0.00  remove_page_from_disk
+  0.00      0.89     0.00     9559     0.00     0.00  replacement_algorithm
+  0.00      0.89     0.00     8897     0.00     0.00  remove_from_ptable
+  0.00      0.89     0.00      670     0.00     0.00  remove_page
+  0.00      0.89     0.00        8     0.00     0.00  create_page_table
+  0.00      0.89     0.00        8     0.00     0.00  create_process
+  0.00      0.89     0.00        8     0.00     0.00  free_process
+  0.00      0.89     0.00        8     0.00     0.00  free_ptable
+  0.00      0.89     0.00        8     0.00     0.00  move_to_finished
+  0.00      0.89     0.00        8     0.00     0.00  remove_all_pages
+  0.00      0.89     0.00        1     0.00     0.00  create_disk
+  0.00      0.89     0.00        1     0.00     0.00  create_queue
+  0.00      0.89     0.00        1     0.00     0.00  create_ready_blocked_queues
+  0.00      0.89     0.00        1     0.00     0.00  free_disk
+  0.00      0.89     0.00        1     0.00     0.00  free_processes
+  0.00      0.89     0.00        1     0.00     0.00  free_queue
+  0.00      0.89     0.00        1     0.00     0.00  init_stats
+  0.00      0.89     0.00        1     0.00     0.00  print_stats
+  0.00      0.89     0.00        1     0.00     0.00  process_args
 
  %         the percentage of the total running time of the
 time       program used by this function.
@@ -60,80 +75,150 @@ notice and this notice are preserved.
 		     Call graph (explanation follows)
 
 
-granularity: each sample hit covers 2 byte(s) for 0.01% of 125.24 seconds
+granularity: each sample hit covers 2 byte(s) for 1.12% of 0.89 seconds
 
 index % time    self  children    called     name
                                                  <spontaneous>
-[1]     99.1   76.27   47.89                 main [1]
-               26.18    0.00 2504693189/2504693189     peek_ready [2]
-               16.14    0.00 2504693182/2504693182     is_ready [3]
-                5.56    0.00    9842/9842        remove_page_from_disk [4]
-                0.00    0.00   19428/19428       search_for_process [12]
-                0.00    0.00    9842/9842        add_page_to_disk [13]
-                0.00    0.00    9842/9842        move_to_blocked [15]
-                0.00    0.00    9842/9842        add_to_ready [14]
-                0.00    0.00       7/7           move_to_finished [16]
-                0.00    0.00       1/1           create_ready_blocked_queues [18]
-                0.00    0.00       1/1           create_disk [17]
-                0.00    0.00       1/1           free_processes [20]
-                0.00    0.00       1/1           free_disk [19]
+[1]     86.5    0.14    0.63                 main [1]
+                0.18    0.10 12009567/12009567     read_next [2]
+                0.06    0.18       1/1           find_all_processes [3]
+                0.03    0.03 12009559/12009559     is_in_ptable [7]
+                0.03    0.00 12019133/12019133     peek_ready [8]
+                0.02    0.00 12019125/12019125     is_ready [10]
+                0.00    0.00    8897/8897        remove_from_ptable [11]
+                0.00    0.00   18456/18456       search_for_process [12]
+                0.00    0.00    9559/9559        add_page_to_disk [13]
+                0.00    0.00    9559/9559        move_to_blocked [17]
+                0.00    0.00    9559/9559        remove_page_from_disk [18]
+                0.00    0.00    9559/9559        replacement_algorithm [19]
+                0.00    0.00    9559/9559        add_to_ptable [14]
+                0.00    0.00    9559/9559        add_to_ready [15]
+                0.00    0.00       8/8           remove_all_pages [26]
+                0.00    0.00       8/8           move_to_finished [25]
+                0.00    0.00       1/1           process_args [35]
+                0.00    0.00       1/1           create_ready_blocked_queues [29]
+                0.00    0.00       1/1           create_disk [27]
+                0.00    0.00       1/1           init_stats [33]
+                0.00    0.00       1/1           create_queue [28]
+                0.00    0.00       1/1           print_stats [34]
+                0.00    0.00       1/1           free_disk [30]
+                0.00    0.00       1/1           free_processes [31]
+                0.00    0.00       1/1           free_queue [32]
 -----------------------------------------------
-               26.18    0.00 2504693189/2504693189     main [1]
-[2]     20.9   26.18    0.00 2504693189         peek_ready [2]
+                0.18    0.10 12009567/12009567     main [1]
+[2]     31.5    0.18    0.10 12009567         read_next [2]
+                0.10    0.00 12033604/24033604     split [4]
 -----------------------------------------------
-               16.14    0.00 2504693182/2504693182     main [1]
-[3]     12.9   16.14    0.00 2504693182         is_ready [3]
+                0.06    0.18       1/1           main [1]
+[3]     27.0    0.06    0.18       1         find_all_processes [3]
+                0.10    0.00 12000000/24033604     split [4]
+                0.08    0.00 12000000/12000000     contains [6]
+                0.00    0.00       8/8           create_process [22]
 -----------------------------------------------
-                5.56    0.00    9842/9842        main [1]
-[4]      4.4    5.56    0.00    9842         remove_page_from_disk [4]
+                0.10    0.00 12000000/24033604     find_all_processes [3]
+                0.10    0.00 12033604/24033604     read_next [2]
+[4]     22.5    0.20    0.00 24033604         split [4]
 -----------------------------------------------
                                                  <spontaneous>
-[5]      0.3    0.35    0.00                 split [5]
+[5]     13.5    0.12    0.00                 compare_pages [5]
 -----------------------------------------------
-                                                 <spontaneous>
-[6]      0.2    0.24    0.00                 compare_pages [6]
+                0.08    0.00 12000000/12000000     find_all_processes [3]
+[6]      9.0    0.08    0.00 12000000         contains [6]
 -----------------------------------------------
-                                                 <spontaneous>
-[7]      0.2    0.19    0.00                 read_next [7]
+                0.03    0.03 12009559/12009559     main [1]
+[7]      6.7    0.03    0.03 12009559         is_in_ptable [7]
+                0.03    0.00 12009559/12018456     find_page [9]
 -----------------------------------------------
-                                                 <spontaneous>
-[8]      0.2    0.19    0.00                 find_all_processes [8]
+                0.03    0.00 12019133/12019133     main [1]
+[8]      3.4    0.03    0.00 12019133         peek_ready [8]
 -----------------------------------------------
-                                                 <spontaneous>
-[9]      0.1    0.11    0.00                 contains [9]
+                0.00    0.00    8897/12018456     remove_from_ptable [11]
+                0.03    0.00 12009559/12018456     is_in_ptable [7]
+[9]      3.4    0.03    0.00 12018456         find_page [9]
 -----------------------------------------------
-                                                 <spontaneous>
-[10]     0.0    0.01    0.00                 is_in_ptable [10]
+                0.02    0.00 12019125/12019125     main [1]
+[10]     2.2    0.02    0.00 12019125         is_ready [10]
 -----------------------------------------------
-                                                 <spontaneous>
-[11]     0.0    0.01    0.00                 create_page_table [11]
+                0.00    0.00    8897/8897        main [1]
+[11]     0.0    0.00    0.00    8897         remove_from_ptable [11]
+                0.00    0.00    8897/12018456     find_page [9]
 -----------------------------------------------
-                0.00    0.00   19428/19428       main [1]
-[12]     0.0    0.00    0.00   19428         search_for_process [12]
+                0.00    0.00   18456/18456       main [1]
+[12]     0.0    0.00    0.00   18456         search_for_process [12]
 -----------------------------------------------
-                0.00    0.00    9842/9842        main [1]
-[13]     0.0    0.00    0.00    9842         add_page_to_disk [13]
+                0.00    0.00    9559/9559        main [1]
+[13]     0.0    0.00    0.00    9559         add_page_to_disk [13]
 -----------------------------------------------
-                0.00    0.00    9842/9842        main [1]
-[14]     0.0    0.00    0.00    9842         add_to_ready [14]
+                0.00    0.00    9559/9559        main [1]
+[14]     0.0    0.00    0.00    9559         add_to_ptable [14]
 -----------------------------------------------
-                0.00    0.00    9842/9842        main [1]
-[15]     0.0    0.00    0.00    9842         move_to_blocked [15]
+                0.00    0.00    9559/9559        main [1]
+[15]     0.0    0.00    0.00    9559         add_to_ready [15]
 -----------------------------------------------
-                0.00    0.00       7/7           main [1]
-[16]     0.0    0.00    0.00       7         move_to_finished [16]
+                0.00    0.00    9559/9559        replacement_algorithm [19]
+[16]     0.0    0.00    0.00    9559         create_node [16]
+-----------------------------------------------
+                0.00    0.00    9559/9559        main [1]
+[17]     0.0    0.00    0.00    9559         move_to_blocked [17]
+-----------------------------------------------
+                0.00    0.00    9559/9559        main [1]
+[18]     0.0    0.00    0.00    9559         remove_page_from_disk [18]
+-----------------------------------------------
+                0.00    0.00    9559/9559        main [1]
+[19]     0.0    0.00    0.00    9559         replacement_algorithm [19]
+                0.00    0.00    9559/9559        create_node [16]
+-----------------------------------------------
+                0.00    0.00     670/670         remove_all_pages [26]
+[20]     0.0    0.00    0.00     670         remove_page [20]
+-----------------------------------------------
+                0.00    0.00       8/8           create_process [22]
+[21]     0.0    0.00    0.00       8         create_page_table [21]
+-----------------------------------------------
+                0.00    0.00       8/8           find_all_processes [3]
+[22]     0.0    0.00    0.00       8         create_process [22]
+                0.00    0.00       8/8           create_page_table [21]
+-----------------------------------------------
+                0.00    0.00       8/8           free_processes [31]
+[23]     0.0    0.00    0.00       8         free_process [23]
+                0.00    0.00       8/8           free_ptable [24]
+-----------------------------------------------
+                0.00    0.00       8/8           free_process [23]
+[24]     0.0    0.00    0.00       8         free_ptable [24]
+-----------------------------------------------
+                0.00    0.00       8/8           main [1]
+[25]     0.0    0.00    0.00       8         move_to_finished [25]
+-----------------------------------------------
+                0.00    0.00       8/8           main [1]
+[26]     0.0    0.00    0.00       8         remove_all_pages [26]
+                0.00    0.00     670/670         remove_page [20]
 -----------------------------------------------
                 0.00    0.00       1/1           main [1]
-[17]     0.0    0.00    0.00       1         create_disk [17]
+[27]     0.0    0.00    0.00       1         create_disk [27]
 -----------------------------------------------
                 0.00    0.00       1/1           main [1]
-[18]     0.0    0.00    0.00       1         create_ready_blocked_queues [18]
+[28]     0.0    0.00    0.00       1         create_queue [28]
 -----------------------------------------------
                 0.00    0.00       1/1           main [1]
-[19]     0.0    0.00    0.00       1         free_disk [19]
+[29]     0.0    0.00    0.00       1         create_ready_blocked_queues [29]
 -----------------------------------------------
                 0.00    0.00       1/1           main [1]
-[20]     0.0    0.00    0.00       1         free_processes [20]
+[30]     0.0    0.00    0.00       1         free_disk [30]
+-----------------------------------------------
+                0.00    0.00       1/1           main [1]
+[31]     0.0    0.00    0.00       1         free_processes [31]
+                0.00    0.00       8/8           free_process [23]
+-----------------------------------------------
+                0.00    0.00       1/1           main [1]
+[32]     0.0    0.00    0.00       1         free_queue [32]
+-----------------------------------------------
+                0.00    0.00       1/1           main [1]
+[33]     0.0    0.00    0.00       1         init_stats [33]
+-----------------------------------------------
+                0.00    0.00       1/1           main [1]
+[34]     0.0    0.00    0.00       1         print_stats [34]
+-----------------------------------------------
+                0.00    0.00       1/1           main [1]
+[35]     0.0    0.00    0.00       1         process_args [35]
 -----------------------------------------------
 
  This table describes the call tree of the program, and was sorted by
@@ -226,10 +311,15 @@ notice and this notice are preserved.
 
 Index by function name
 
-  [13] add_page_to_disk        [8] find_all_processes     [16] move_to_finished
-  [14] add_to_ready           [19] free_disk               [2] peek_ready
-   [6] compare_pages          [20] free_processes          [7] read_next
-   [9] contains               [10] is_in_ptable            [4] remove_page_from_disk
-  [17] create_disk             [3] is_ready               [12] search_for_process
-  [11] create_page_table       [1] main                    [5] split
-  [18] create_ready_blocked_queues [15] move_to_blocked
+  [13] add_page_to_disk        [9] find_page               [8] peek_ready
+  [14] add_to_ptable          [30] free_disk              [34] print_stats
+  [15] add_to_ready           [23] free_process           [35] process_args
+   [5] compare_pages          [31] free_processes          [2] read_next
+   [6] contains               [24] free_ptable            [26] remove_all_pages
+  [27] create_disk            [32] free_queue             [11] remove_from_ptable
+  [16] create_node            [33] init_stats             [20] remove_page
+  [21] create_page_table       [7] is_in_ptable           [18] remove_page_from_disk
+  [22] create_process         [10] is_ready               [19] replacement_algorithm
+  [28] create_queue            [1] main                   [12] search_for_process
+  [29] create_ready_blocked_queues [17] move_to_blocked    [4] split
+   [3] find_all_processes     [25] move_to_finished

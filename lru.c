@@ -154,6 +154,7 @@ unsigned long int remove_page(queue_t* queue, unsigned long int pid) {
             if (curr == queue->front) {
                 queue->front = curr->next;
                 queue->curr_size--;
+                free(curr);
                 return 1;
             }
             curr->prev->next = curr->next;
@@ -167,6 +168,7 @@ unsigned long int remove_page(queue_t* queue, unsigned long int pid) {
                 queue->back->next = NULL;
             }
             queue->curr_size--;
+            free(curr);
             return 1;
         }
         curr = curr->next;

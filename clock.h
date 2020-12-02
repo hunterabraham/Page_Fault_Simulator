@@ -9,6 +9,7 @@ typedef struct queue_node_t {
     struct queue_node_t* next;
     unsigned long int ready;
     page_t* page;
+    unsigned long int is_here;
 } queue_node_t;
 
 typedef struct queue_t {
@@ -34,7 +35,6 @@ queue_node_t* create_node(page_t* page);
  * @return     - a pointer to the clock queue
  */
 queue_t* create_queue(int size);
-
 
 
 /**
