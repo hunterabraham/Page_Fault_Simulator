@@ -1,8 +1,24 @@
+////////////////////////////////////////////////////////////////////////////////
+// Main File:        main.c
+// This File:        process.c
+// Semester:         CS 537 Fall 2020
+//
+// Authors:          Hunter Abraham
+// Emails:           hjabraham@wisc.edu
+// CS Logins:        habraham
+//
+/////////////////////////// OTHER SOURCES OF HELP //////////////////////////////
+// 									NONE
+////////////////////////////////////////////////////////////////////////////////
+
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include "process.h"
 
 process_t* create_process(unsigned long int pid) {
+	// creates a process & initializes its page table
 	unsigned long int BUFSIZE = 4096;
 	process_t* new_proc = (process_t*)malloc(sizeof(process_t));
 	if (NULL == new_proc) {
@@ -25,14 +41,9 @@ process_t* create_process(unsigned long int pid) {
 	return new_proc;
 }
 
-unsigned long int is_waiting(process_t* process, unsigned long int clock) {
-	if (process->time_when_ready <= clock) {
-		return 0;
-	}
-	return 1;
-}
 
 void free_process(process_t* process) {
+	// frees a process & its memory
 	free_ptable(process->page_table);
 	free(process->blocks);
 	free(process);

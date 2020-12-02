@@ -1,3 +1,17 @@
+////////////////////////////////////////////////////////////////////////////////
+// Main File:        main.c
+// This File:        main.c 
+// Semester:         CS 537 Fall 2020
+//
+// Authors:          Hunter Abraham
+// Emails:           hjabraham@wisc.edu
+// CS Logins:        habraham
+//
+/////////////////////////// OTHER SOURCES OF HELP //////////////////////////////
+//  https://github.com/increscent/c_examples/tree/main/multiple_modules
+//  - the TAs example of using interfaces in C
+////////////////////////////////////////////////////////////////////////////////
+
 #ifndef PR_INTERFACE_H
 #define PR_INTERFACE_H
 
@@ -28,7 +42,7 @@ typedef struct queue_t {
  * @param size - the size of the clock queue
  * @return     - a pointer to the clock queue
  */
-queue_t* create_queue(int size);
+queue_t* create_queue(unsigned long int size);
 
 
 /**
@@ -66,7 +80,5 @@ page_t* replacement_algorithm(queue_t* queue, page_t* page);
  * @param page  - the page in the file that is begin referenced 
  */
 void update_mem_reference(queue_t* queue, page_t* page);
-
-
 
 #endif

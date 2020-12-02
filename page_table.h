@@ -1,6 +1,21 @@
+////////////////////////////////////////////////////////////////////////////////
+// Main File:        main.c
+// This File:        page_table.h
+// Semester:         CS 537 Fall 2020
+//
+// Authors:          Hunter Abraham
+// Emails:           hjabraham@wisc.edu
+// CS Logins:        habraham
+//
+/////////////////////////// OTHER SOURCES OF HELP //////////////////////////////
+//  https://github.com/increscent/c_examples/tree/main/tsearch
+//  - the TAs example of using tsearch() in C -- it was posted on Piazza by a TA
+//  tsearch(3) - Linux Manual Page
+////////////////////////////////////////////////////////////////////////////////
+
+
 #ifndef PTABLE_H
 #define PTABLE_H
-#include <search.h>
 
 // page to be held in page table
 typedef struct page_t {
@@ -21,12 +36,11 @@ typedef struct page_table_t {
  * 
  * @param size - the size of the page table
  * @return     - a pointer to the new page table
- */ 
+ */
 page_table_t* create_page_table();
 
 /**
  * Compares two pages when they are being added to the binary tree
- * 
  * 
  * @param page1 - the first page being compared
  * @param page2 - the second page being compared
@@ -34,16 +48,6 @@ page_table_t* create_page_table();
  */
 int compare_pages(const void* page1, const void* page2);
 
-
-/**
- * Searches ptable for page with <pid, vpn>
- * 
- * @param table - the page table being searched
- * @param pid   - the pid of the page being searched for
- * @param vpn   - the vpn of the page being searched for
- * @return      - the page if found, otherwise NULL
- */
-page_t* get_from_ptable(page_table_t* table, unsigned long int pid, unsigned long int vpn);
 
 /**
  * Adds a page to the ptable using hash function

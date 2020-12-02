@@ -1,3 +1,16 @@
+////////////////////////////////////////////////////////////////////////////////
+// Main File:        main.c
+// This File:        lru.c
+// Semester:         CS 537 Fall 2020
+//
+// Authors:          Hunter Abraham
+// Emails:           hjabraham@wisc.edu
+// CS Logins:        habraham
+//
+/////////////////////////// OTHER SOURCES OF HELP //////////////////////////////
+// fseek(3) - Linux Manual
+////////////////////////////////////////////////////////////////////////////////
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <search.h>
@@ -6,7 +19,9 @@
 #include "process.h"
 
 
+
 queue_node_t* create_node(page_t* page) {
+    // create node and initialize struct members, all NULL except for page
     queue_node_t* new_node = malloc(sizeof(queue_node_t));
     if (NULL == new_node) {
         fprintf(stderr, "Error allocating new_node in create_node in lru.c\n");
@@ -19,7 +34,8 @@ queue_node_t* create_node(page_t* page) {
 }
 
 
-queue_t* create_queue(int size) {
+queue_t* create_queue(unsigned long int size) {
+    // allocate queue & initialize struct members
     queue_t* new_queue = malloc(sizeof(queue_t));
     if (NULL == new_queue) {
         fprintf(stderr, "Error allocating new_queue in create_queue() in lru.c\n");
@@ -32,55 +48,11 @@ queue_t* create_queue(int size) {
     return new_queue;
 }
 
-/**
- * Pops the first element from the lru queue
- * 
- * @param size - the size of the lru queue
- * @return     - the index that is popped from the queue
- */
-page_t* pop_from_queue(queue_t* queue) {
-    if (queue->curr_size == 0) { // sanity check
-        return NULL;
-    }
-    if (queue->curr_size == 1) {
-        page_t* ret = queue->front->page; 
-        queue->front = NULL; // FIXME will this set ret to NULL?
-        queue->back = NULL; // FIXME
-        queue->curr_size--;
-        return ret;
-    }
-    page_t* ret = queue->back->page;
-    queue->back = queue->back->prev;
-    if (queue->back != NULL) {
-        free(queue->back->next); // FIXME needed?
-        queue->back->next = NULL;
-    }
-    queue->curr_size--;
-    return ret;
-}
-
-/**
- * Pushes an element to the end of the queue
- * 
- * @param queue - the queue being pushed to
- * @param index - the index being pushed
- */
-void push_to_queue(queue_t* queue, page_t* page) {
-    queue_node_t* new_node = create_node(page);
-    new_node->next = queue->front;
-    if (queue->curr_size == 0) {
-        queue->back = new_node;
-        queue->front = new_node;
-    } else {
-        queue->front->prev = new_node;
-        queue->front = new_node;
-    }
-    queue->curr_size++;
-}
-
 
 page_t* replacement_algorithm(queue_t* queue, page_t* page) {
+    // if queue is not full
     if (queue->curr_size < queue->max_size) {
+        // add page to front of queue
         queue_node_t* new_node = create_node(page);
         new_node->next = queue->front;
         if (queue->curr_size == 0) {
@@ -94,9 +66,13 @@ page_t* replacement_algorithm(queue_t* queue, page_t* page) {
         queue->curr_size++;
         return NULL;
     }
+    // if queue is full
     page_t* ret = queue->back->page;
-    queue->back = queue->back->prev; // remove node from end of list
+    // remove node from end of list
+    queue->back = queue->back->prev; 
+    free(queue->back->next);
     queue->back->next = NULL;
+    // add node to front of list
     queue_node_t* new_node = create_node(page);
     new_node->next = queue->front;
     queue->front->prev = new_node;
@@ -110,12 +86,13 @@ void update_mem_reference(queue_t* queue, page_t* page) {
     }
     unsigned long int i = 0;
     queue_node_t* curr = queue->front;
+    // search for page in queue
     while(curr != NULL) {
         if (curr->page->vpn == page->vpn &&  curr->page->pid == page->pid) {
+            // if found & not front
             if (curr != queue->front) {
-                // unlink node
+                // remove node from queue
                 curr->prev->next = curr->next;
-                // maintain prev pointers
                 if (curr->next != NULL) {
                     curr->next->prev = curr->prev;
                 }
@@ -148,9 +125,10 @@ void update_mem_reference(queue_t* queue, page_t* page) {
  */
 unsigned long int remove_page(queue_t* queue, unsigned long int pid) {
     queue_node_t* curr = queue->front;
+    // search for page with matching pid
     while(curr != NULL) {
         if (curr->page->pid == pid) {
-            // unlink node
+            // remove node from queue
             if (curr == queue->front) {
                 queue->front = curr->next;
                 queue->curr_size--;
@@ -179,7 +157,9 @@ unsigned long int remove_page(queue_t* queue, unsigned long int pid) {
 unsigned long int remove_all_pages(queue_t* queue, unsigned long int pid) {
     unsigned long int flag = 1;
     unsigned long int count = 0;
+    // while there is a node with the specified pid
     while(flag) {
+        // remove it
         flag = remove_page(queue, pid);
         count++;
     }
@@ -193,7 +173,7 @@ unsigned long int remove_all_pages(queue_t* queue, unsigned long int pid) {
  * @param queue - the queue to be freed 
  */
 void free_queue(queue_t* queue) {
-    free(queue); // FIXME: front, back pointer?
+    free(queue); 
 }
 
 

@@ -1,3 +1,17 @@
+////////////////////////////////////////////////////////////////////////////////
+// Main File:        main.c
+// This File:        process.h
+// Semester:         CS 537 Fall 2020
+//
+// Authors:          Hunter Abraham
+// Emails:           hjabraham@wisc.edu
+// CS Logins:        habraham
+//
+/////////////////////////// OTHER SOURCES OF HELP //////////////////////////////
+// 									NONE
+////////////////////////////////////////////////////////////////////////////////
+
+
 #ifndef PROCESS_H
 #define PROCESS_H
 #include <stdio.h>
@@ -28,13 +42,6 @@ typedef struct process_t {
 	unsigned long int num_pages;
 } process_t;
 
-/**
- * Determines if the process is waiting or not
- * 
- * @param proc  - the process that is being checked
- * @param clock - the clock to compare to
- */
-unsigned long int is_waiting(process_t* process, unsigned long int clock);
 
 /**
  * Creates a process with the pid specified

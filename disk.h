@@ -1,3 +1,17 @@
+////////////////////////////////////////////////////////////////////////////////
+// Main File:        main.c
+// This File:        disk.h
+// Semester:         CS 537 Fall 2020
+//
+// Authors:          Hunter Abraham
+// Emails:           hjabraham@wisc.edu
+// CS Logins:        habraham
+//
+/////////////////////////// OTHER SOURCES OF HELP //////////////////////////////
+// None
+////////////////////////////////////////////////////////////////////////////////
+
+
 #ifndef DISK_H
 #define DISK_H
 
@@ -16,7 +30,7 @@ typedef struct disk_t {
 	unsigned long int curr_size;
 	unsigned long int begin;
 	unsigned long int end;
-	unsigned long int max_size; // ?? use realloc if max_size <= curr_size
+	unsigned long int max_size; 
 	unsigned long int** completion_times;
 } disk_t;
 

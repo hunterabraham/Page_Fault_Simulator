@@ -1,3 +1,17 @@
+////////////////////////////////////////////////////////////////////////////////
+// Main File:        main.c
+// This File:        fifo.c
+// Semester:         CS 537 Fall 2020
+//
+// Authors:          Hunter Abraham
+// Emails:           hjabraham@wisc.edu
+// CS Logins:        habraham
+//
+/////////////////////////// OTHER SOURCES OF HELP //////////////////////////////
+// None
+////////////////////////////////////////////////////////////////////////////////
+
+
 #include <stdlib.h>
 #include <stdio.h>
 #include "page_replacement_interface.h"
@@ -26,7 +40,7 @@ queue_node_t* create_node(page_t* page) {
  * @param size - the size of the lru queue
  * @return     - a pointer to the lru queue
  */
-queue_t* create_queue(int size) {
+queue_t* create_queue(unsigned long int size) {
     queue_t* new_queue = malloc(sizeof(queue_t));
     if (NULL == new_queue) {
         fprintf(stderr, "Error allocating new_queue in create_queue() in fifo.c\n");
@@ -133,6 +147,7 @@ unsigned long int remove_page(queue_t* queue, unsigned long int pid) {
 unsigned long int remove_all_pages(queue_t* queue, unsigned long int pid) {
     unsigned long int flag = 1;
     unsigned long int count = 0;
+    // while a page has been found, remove the next page
     while(flag) {
         count++;
         flag = remove_page(queue, pid);
@@ -140,7 +155,10 @@ unsigned long int remove_all_pages(queue_t* queue, unsigned long int pid) {
     return count;
 }
 
-
+/**
+ * Does nothing for FIFO
+ */
 void update_mem_reference(queue_t* queue, page_t* page) {
-    
+    queue = queue; // to remove compiler warnings
+    page = page;
 }

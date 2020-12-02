@@ -2,6 +2,21 @@
 
 ## Page fault simulator using various page replacement algorithms
 
+## 537pfsim-fifo
+Runs the page fault simulator with a FIFO page replacement algorithm
+
+## 537pfsim-lru
+Runs the page fault simulator with an LRU page replacement algorithm
+
+## 537pfsim-clock
+Runs the page fault simulator with a Clock page replacement algorithm
+
+## Arguments
+* **-p <page_size>** - the size of a page in physical memory
+* **-m <mem_size>** - the size of physical memory
+* **<file_name>** - the file path to the trace file   
+
+
 ## Main Algorithm
 
 1. Get command line arguments (page size, real memory size, and trace file name)
@@ -55,12 +70,12 @@
 	- *Status:* DONE, TESTED
 	- *Files:* process.h, process.c
 	- *Methods:*
-		- `unsigned long int is_waiting(process_t* process, unsigned long int clock)`
-			- *Status:* DONE, TESTED
-			- *Functionality:* Determines if a process is waiting or not
 		- `process_t* create_process(unsigned long int pid);`
 			- *Status:* DONE, TESTED
 			- *Functionality:* Creates a process and initializes struct members
+		- `void free_process(process_t* process)`
+			- *Status:* DONE, TESTED
+			- *Functionality:* Frees a process and its memory
 
 - **page_table.h**
 	- *Summary:* Stores a page table implemented as a binary tree
@@ -70,15 +85,25 @@
 		- `page_table_t* create_page_table(unsigned long int size)`
 			- *Status:* DONE, TESTED
 			- *Functionality:* Creates a page table and initializes struct members
-		- `page_t* get_from_ptable(page_table_t* table, unsigned long int pid, unsigned long int vpn)`
+		- `int compare_pages(const void* page1, const void* page2)`
 			- *Status:* DONE, TESTED
-			- *Functionality:* Gets the page from the page table with the corresponding vpn
+			- *Functionality:* Compares pages in the table to determine their position in the tree
 		- `void add_to_ptable(page_table_t* ptable, page_t* page)`
 			- *Status:* DONE, TESTED
 			- *Functionality:* Adds a new page to the page table
 		- `page_t* remove_from_ptable(page_table_t* ptable, page_t* page)`
 			- *Status:* DONE, TESTED
 			- *Functionality:* Removes a page from the page table
+		- `page_t* find_page(void** root, page_t* page)`
+			- *Status:* DONE, TESTED
+			- *Functionality:* Finds a page in the tree
+		- `unsigned long int is_in_ptable(page_table_t* table, page_t* page)`
+			- *Status:* DONE, TESTED
+			- *Functionality:* Determines if a page is in the page table or not
+		- `void free_ptable(page_table_t* table)`
+			- *Status:* DONE, TESTED
+			- *Functionality:* Frees the page table's allocated memory
+
 
 - **disk.h**
 	- *Summary:* Stores all pages being pushed to disk
@@ -110,18 +135,18 @@
 		- `process_queue_t* create_process_queue(int size)`
 			- *Status:* DONE, TESTED
 			- *Functionality:* Creates an individual queue (ready or blocked) for the ready-blocked system
-		- `process_t* get_next_process(ready_blocked_queues_t* queue)`
-			- *Status:* DONE, TESTED
-			- *Functionality:* Gets the next ready process
-		- `void update_queues(ready_blocked_queues_t* queue, unsigned long int clock)`
-			- *Status:* DONE, TESTED
-			- *Functionality:* Moves the first element in blocked to ready if it is ready
 		- `void move_to_blocked(ready_blocked_queues_t* queue)`
 			- *Status:* DONE, TESTED
 			- *Functionality:* Moves a process to the blocked queue
 		- `void add_to_ready(ready_blocked_queues_t* queues)`
 			- *Status:* DONE, TESTED
 			- *Functionality:* Moves a process to the ready queue
+		- `process_t* peek_ready(ready_blocked_queues_t* queues)`
+			- *Status:* DONE, TESTED
+			- *Functionality:* Peeks at the first process in ready queue
+		- `process_t* search_for_process(ready_blocked_queues_t* queues, unsigned long int pid)`
+			- *Status:* DONE, TESTED
+			- *Functionality:* Searches for a process with the given PID
 		- `void free_processes(ready_blocked_queues_t* queues)`
 			- *Status:* DONE, TESTED
 			- *Functionality:* Frees the processes and all of its members, including blocks and page tables
@@ -146,6 +171,4 @@
 		- `void update_mem_reference(queue_t* queue, page_t* page)`
 			- *Status:* INP - clock not working correctly
 			- *Functionality:* Updates the memory reference for the page if necessary
-
-
  

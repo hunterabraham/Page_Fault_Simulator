@@ -1,3 +1,17 @@
+////////////////////////////////////////////////////////////////////////////////
+// Main File:        main.c
+// This File:        input.c
+// Semester:         CS 537 Fall 2020
+//
+// Authors:          Hunter Abraham
+// Emails:           hjabraham@wisc.edu
+// CS Logins:        habraham
+//
+/////////////////////////// OTHER SOURCES OF HELP //////////////////////////////
+// fseek(3) - Linux Manual
+////////////////////////////////////////////////////////////////////////////////
+
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -11,7 +25,7 @@ long int contains(process_t** pinfo_list, unsigned long int pid) {
 		fprintf(stderr, "pinfo_list not initialized when running contains().\n");
 		exit(1);
 	}
-	while(pinfo_list[i] != NULL) {
+	while(pinfo_list[i] != NULL) { // searches processes to find PID
 		if (pinfo_list[i]->pid == pid) {
 			return i;
 		}
@@ -20,25 +34,27 @@ long int contains(process_t** pinfo_list, unsigned long int pid) {
 	return -1;
 }
 
-unsigned long int* split(char* buffer) {
+unsigned long int* split(char* buffer) { 
 	size_t split_idx;
 	unsigned long int flag = 0;
-	for (size_t i = 0; i < strlen(buffer); ++i) {
-		if (buffer[i] != ' ') {
+	// mark the splitting point
+	for (size_t i = 0; i < strlen(buffer); ++i) { 
+		if (buffer[i] != ' ') { // ignore whitespace before first element
 			flag = 1;
 			continue;
 		}
-		if (flag && buffer[i] == ' ') {
+		if (flag && buffer[i] == ' ') { // find first whitespace after pid
 			split_idx = i;
 			break;
 		}
 	}
 	
-	char* v_addr_str = (buffer + split_idx + 1);
+	char* v_addr_str = (buffer + split_idx + 1); // vpn after split idx
 	*(v_addr_str + strlen(v_addr_str)) = '\0';
-	*(buffer + split_idx) = '\0';
-	unsigned long int vaddr = atoi(v_addr_str);
+	*(buffer + split_idx) = '\0'; // pid before split idx
+	unsigned long int vaddr = atoi(v_addr_str); // convert to ints
 	unsigned long int pid_save = atoi(buffer);
+	// put pid, vpn in array to return
 	unsigned long int* ret_arr = malloc(sizeof(unsigned long int) * 2);
 	if (NULL == ret_arr) {
 		fprintf(stderr, "Error allocating ret_arr in split() in input.c\n");
@@ -58,11 +74,13 @@ process_t** find_all_processes(char* fpath, unsigned long int* num_mem_refs) {
 		fprintf(stderr, "Error allocating pinfo_list in findAllProcesses() in input.c\n");
 		exit(1);
 	}
+	// buffer for input
 	char buffer[BUFSIZE];
 	if (NULL == buffer) {
 		fprintf(stderr, "Error allocating buffer in findAllProcesses() in input.c\n");
 		exit(1);
 	}
+	// pointer to trace file
 	FILE* trace_file = fopen(fpath, "r");
 	if (NULL == trace_file) {
 		fprintf(stderr, "Error opening file \"%s\" in find_all_processes in input.c\n", fpath);
@@ -71,7 +89,9 @@ process_t** find_all_processes(char* fpath, unsigned long int* num_mem_refs) {
 	unsigned long int process_list_idx = 0;
 	unsigned long int curr_row = 0;
 	unsigned long int curr_num_bytes = 0;
+	// while there is still input
 	while(NULL != fgets(buffer, BUFSIZE, trace_file)) {
+		// find number of bytes that are in the current line
 		unsigned long int temp_bytes = strlen(buffer);
 		unsigned long int* ret_arr = split(buffer); // current line
 		unsigned long int pid = ret_arr[1];
@@ -80,16 +100,19 @@ process_t** find_all_processes(char* fpath, unsigned long int* num_mem_refs) {
 			process_t* new_proc = create_process(pid);
 			//new_proc->first_ref = curr_row; // mark the first reference
 			new_proc->last_ref = curr_row;
+			// have first block start & end at the current number of bytes
 			new_proc->blocks[new_proc->num_blocks].start = curr_num_bytes;
 			new_proc->blocks[new_proc->num_blocks].end = curr_num_bytes;
 			new_proc->blocks[new_proc->num_blocks].curr_line = 0;
 			new_proc->num_blocks++;
 			new_proc->fptr = fopen(fpath, "r");
-			fseek(new_proc->fptr, curr_num_bytes, SEEK_SET); // FIXME
+			// move the file pointer of the current process to the current number of bytes
+			fseek(new_proc->fptr, curr_num_bytes, SEEK_SET);
 			if (NULL == new_proc->fptr) {
 				fprintf(stderr, "Error opening file in findAllProcesses() in input.c\n");
 				exit(1);
 			}
+			// add process to the process list
 			process_list[process_list_idx] = new_proc;
 			process_list_idx++;
 		} else { // process already in table, update row and potentially create new block / update block
@@ -106,11 +129,10 @@ process_t** find_all_processes(char* fpath, unsigned long int* num_mem_refs) {
 		}
 		curr_row++;
 		curr_num_bytes += temp_bytes; // add number of bytes in the current line
-
 		free(ret_arr);
 	}
 	fclose(trace_file);
-	*num_mem_refs = curr_row; // FIXME
+	*num_mem_refs = curr_row; 
 	return process_list;
 }
 
@@ -120,6 +142,7 @@ page_t* read_next(process_t* process) {
 	char BUFFER[BUFSIZE];
 	char* result = NULL;
 	while (1) { 
+		// read next line
 		result = fgets(BUFFER, BUFSIZE, process->fptr);
 		if (result == NULL) {
 			return NULL;
@@ -133,14 +156,16 @@ page_t* read_next(process_t* process) {
 				return NULL;
 			}
 			process->curr_block_idx++;
-			block_t curr_block = process->blocks[process->curr_block_idx]; // FIXME what if we're at the last block?
+			block_t curr_block = process->blocks[process->curr_block_idx]; 
 			int next_idx = curr_block.start;
 			fseek(process->fptr, (next_idx), SEEK_SET); // move to next block in file
 			free(res_array);
-			continue; // FIXME: Process should not continue if a different block is executing
+			continue; 
 		}
+		// find vpn and pid
 		unsigned long int vpn = res_array[0];
 		unsigned long int this_pid = res_array[1];
+		// create new page and return it
 		page_t* new_page = malloc(sizeof(page_t));
 		if (NULL == new_page) {
 			fprintf(stderr, "Error allocating new_page in read_next() in input.c\n");

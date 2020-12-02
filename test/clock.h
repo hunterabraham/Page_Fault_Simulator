@@ -14,6 +14,8 @@ typedef struct queue_node_t {
 typedef struct queue_t {
     struct queue_node_t* front;
     struct queue_node_t* back;
+    unsigned long int* free_list;
+    unsigned long int free_idx;
     unsigned long int curr_size;
     unsigned long int max_size;
     struct queue_node_t* curr_ptr;

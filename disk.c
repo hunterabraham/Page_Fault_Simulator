@@ -1,3 +1,18 @@
+////////////////////////////////////////////////////////////////////////////////
+// Main File:        main.c
+// This File:        disk.c 
+// Semester:         CS 537 Fall 2020
+//
+// Authors:          Hunter Abraham
+// Emails:           hjabraham@wisc.edu
+// CS Logins:        habraham
+//
+/////////////////////////// OTHER SOURCES OF HELP //////////////////////////////
+// None
+////////////////////////////////////////////////////////////////////////////////
+
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include "disk.h"
@@ -13,6 +28,7 @@
  * @return     - a pointer to the new disk
  */
 disk_t* create_disk(int size) {
+	// allocate disk, disk array, and initialize struct members
 	disk_t* new_disk = malloc(sizeof(disk_t));
 	if (NULL == new_disk) {
 		fprintf(stderr, "Error allocating new_disk in create_disk() in disk.c\n");
@@ -42,6 +58,7 @@ void add_page_to_disk(disk_t* disk, page_t* page, unsigned long int clock) {
 	if (disk->curr_size == 0) { // if there is no page in disk, update I/O time
 		disk->next_time_for_access = clock + 2000000;
 	}
+	// add page to end and increment end index
 	disk->page_array[disk->end] = page;
 	disk->end = (disk->end + 1) % disk->max_size;
 	disk->curr_size++;
@@ -54,9 +71,11 @@ void add_page_to_disk(disk_t* disk, page_t* page, unsigned long int clock) {
  * @return     - the page that is removed (the first one in the queue)
  */
 page_t* remove_page_from_disk(disk_t* disk, unsigned long int clock) {
-	if (disk->curr_size != 0) { // if there is a page available, update I/O times
+	// if there is a page available, update I/O times
+	if (disk->curr_size != 0) {
 		disk->next_time_for_access = clock + 2000000;
 	}
+	// remove page from front of disk & advance pointer
 	page_t* page = disk->page_array[disk->begin];
 	disk->begin = (disk->begin + 1) % disk->max_size;
 	disk->curr_size--;

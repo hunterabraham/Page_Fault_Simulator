@@ -1,3 +1,18 @@
+////////////////////////////////////////////////////////////////////////////////
+// Main File:        main.c
+// This File:        process_queue.h
+// Semester:         CS 537 Fall 2020
+//
+// Authors:          Hunter Abraham
+// Emails:           hjabraham@wisc.edu
+// CS Logins:        habraham
+//
+/////////////////////////// OTHER SOURCES OF HELP //////////////////////////////
+// 									NONE
+////////////////////////////////////////////////////////////////////////////////
+
+
+
 #ifndef PROCESS_Q_H
 #define PROCESS_Q_H
 
@@ -24,7 +39,7 @@ typedef struct process_queue_t {
 typedef struct ready_blocked_queues_t {
 	process_queue_t* ready_queue;
 	process_queue_t* blocked_queue;
-	process_queue_t* finished_queue;
+	//process_queue_t* finished_queue;
 	unsigned long int num_procs;
 } ready_blocked_queues_t;
 
@@ -44,25 +59,6 @@ ready_blocked_queues_t* create_ready_blocked_queues(int size, process_t** ready_
  * @return     - the process queue
  */
 process_queue_t* create_process_queue(int size);
-
-/**
- * When the current process gets blocked, this method finds the next
- * available process and returns it
- *
- * @param queue - the ready and blocked queues to update from
- * @return      - the next process to run
- */
-process_t* get_next_process(ready_blocked_queues_t* queue);
-
-
-
-/**
- * Updates the ready and blocked queues. When the process is unblocked, it
- * is added to the end of the ready queue.
- * 
- * @param queue - the system of ready and blocked queues to grab from
- */
-void update_queues(ready_blocked_queues_t* queue, unsigned long int clock);
 
 
 /**
@@ -101,13 +97,6 @@ unsigned long int remove_from_ready(ready_blocked_queues_t* queues);
  * @return       - the process that is found
  */
 process_t* search_for_process(ready_blocked_queues_t* queues, unsigned long int pid);
-
-/**
- * Moves a finished process that's done executing from ready to finished
- * 
- * @param queues - the queues being manipulated
- */
-unsigned long int move_to_finished(ready_blocked_queues_t* queues);
 
 
 /**
